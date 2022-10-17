@@ -1,0 +1,511 @@
+export declare type CreateWorker = (workerName: string) => Worker;
+export declare type Messenger = (receiveMessage: MessengerRequestCallback) => Promise<MessengerHandler | null>;
+export declare type MessengerRequestCallback = (accessReq: MainAccessRequest, responseCallback: MessengerResponseCallback) => void;
+export declare type MessengerHandler = (worker: PartytownWebWorker, msg: MessageFromWorkerToSandbox) => void;
+export declare type MessengerResponseCallback = (accessRsp: MainAccessResponse) => void;
+export declare type WinId = string;
+export declare type InstanceId = string;
+export declare type RefId = string;
+export interface AssignWinInstanceId {
+    $winId$: WinId;
+}
+export declare type AssignInstanceId = InstanceId | AssignWinInstanceId;
+export declare type MessageFromWorkerToSandbox = [type: WorkerMessageType.MainDataRequestFromWorker] | [type: WorkerMessageType.MainInterfacesRequestFromWorker] | [type: WorkerMessageType.InitializedWebWorker] | [
+    type: WorkerMessageType.InitializedEnvironmentScript,
+    winid: WinId,
+    instanceId: InstanceId,
+    errorMsg: string
+] | [type: WorkerMessageType.InitializeNextScript, winId: WinId] | [type: WorkerMessageType.ForwardWorkerAccessRequest, accessReq: MainAccessRequest] | [type: WorkerMessageType.AsyncAccessRequest, accessReq: MainAccessRequest];
+export declare type MessageFromSandboxToWorker = [type: WorkerMessageType.MainDataResponseToWorker, initWebWorkerData: InitWebWorkerData] | [type: WorkerMessageType.MainInterfacesResponseToWorker, interfaces: InterfaceInfo[]] | [type: WorkerMessageType.InitializeEnvironment, initEnvData: InitializeEnvironmentData] | [type: WorkerMessageType.InitializeNextScript, initScriptData: InitializeScriptData] | [type: WorkerMessageType.InitializedScripts, winId: WinId] | [type: WorkerMessageType.RefHandlerCallback, callbackData: RefHandlerCallbackData] | [type: WorkerMessageType.ForwardMainTrigger, triggerData: ForwardMainTriggerData] | [type: WorkerMessageType.LocationUpdate, locationChangeData: LocationUpdateData] | [type: WorkerMessageType.DocumentVisibilityState, winId: WinId, visibilityState: string] | [
+    type: WorkerMessageType.CustomElementCallback,
+    winId: WinId,
+    instanceId: InstanceId,
+    callbackName: string,
+    args: any[]
+];
+export declare const enum WorkerMessageType {
+    MainDataRequestFromWorker = 0,
+    MainDataResponseToWorker = 1,
+    MainInterfacesRequestFromWorker = 2,
+    MainInterfacesResponseToWorker = 3,
+    InitializedWebWorker = 4,
+    InitializeEnvironment = 5,
+    InitializedEnvironmentScript = 6,
+    InitializeNextScript = 7,
+    InitializedScripts = 8,
+    RefHandlerCallback = 9,
+    ForwardMainTrigger = 10,
+    ForwardWorkerAccessRequest = 11,
+    AsyncAccessRequest = 12,
+    LocationUpdate = 13,
+    DocumentVisibilityState = 14,
+    CustomElementCallback = 15
+}
+export declare const enum LocationUpdateType {
+    PushState = 0,
+    ReplaceState = 1,
+    PopState = 2,
+    HashChange = 3
+}
+export interface LocationUpdateData {
+    $winId$: WinId;
+    type: LocationUpdateType;
+    state: object;
+    url: string;
+    newUrl?: string;
+    oldUrl?: string;
+}
+export interface ForwardMainTriggerData {
+    $winId$: WinId;
+    $forward$: string[];
+    $args$: SerializedTransfer | undefined;
+}
+export interface RefHandlerCallbackData {
+    $winId$: WinId;
+    $instanceId$: InstanceId;
+    $refId$: RefId;
+    $thisArg$: SerializedTransfer | undefined;
+    $args$: SerializedTransfer | undefined;
+}
+export declare type PostMessageToWorker = (msg: MessageFromSandboxToWorker) => void;
+export interface MainWindowContext {
+    $winId$: WinId;
+    $isInitialized$?: number;
+    $startTime$?: number;
+    $window$: MainWindow;
+}
+export interface PartytownWebWorker extends Worker {
+    postMessage: PostMessageToWorker;
+}
+export interface InitWebWorkerData {
+    $config$: string;
+    $interfaces$: InterfaceInfo[];
+    $libPath$: string;
+    $sharedDataBuffer$?: SharedArrayBuffer;
+    $localStorage$: StorageItem[];
+    $sessionStorage$: StorageItem[];
+    $origin$: string;
+}
+/**
+ * [0] Constructor name
+ * [1] Prototype parent constructor name
+ * [2] InterfaceMember[]
+ * [3]? InterfaceType
+ * [4]? Node Name
+ */
+export declare type InterfaceInfo = [string, string, InterfaceMember[], InterfaceType, string] | [string, string, InterfaceMember[], InterfaceType] | [string, string, InterfaceMember[]];
+/**
+ * [0] Member name
+ * [1] Constructor name or interface type
+ * [2]? If there's a value it's a static prop
+ */
+export declare type InterfaceMember = [string, string] | [string, InterfaceType.Function] | [string, InterfaceType.Property] | [string, InterfaceType.Property, string | number | boolean];
+export interface WebWorkerContext {
+    $asyncMsgTimer$?: any;
+    $config$: PartytownConfig;
+    $importScripts$: (...urls: string[]) => void;
+    $initWindowMedia$?: InitWindowMedia;
+    $interfaces$: InterfaceInfo[];
+    $indexedDB$: any;
+    $isInitialized$?: number;
+    $libPath$: string;
+    $origin$: string;
+    $postMessage$: (msg: MessageFromWorkerToSandbox, arr?: any[]) => void;
+    $sharedDataBuffer$?: SharedArrayBuffer;
+    lastLog?: string;
+}
+export interface InitializeEnvironmentData {
+    $winId$: WinId;
+    $parentWinId$: WinId;
+    $url$: string;
+    $visibilityState$?: string;
+}
+export interface WebWorkerEnvironment {
+    $winId$: WinId;
+    $parentWinId$: WinId;
+    $window$: Window;
+    $document$: Document;
+    $documentElement$: HTMLElement;
+    $head$: HTMLElement;
+    $body$: HTMLElement;
+    $location$: Location;
+    $visibilityState$?: string;
+    $createNode$: (nodeName: string, instanceId: InstanceId, namespace?: string) => WorkerNode;
+    $currentScriptId$?: InstanceId;
+    $isInitialized$?: number;
+    $isLoading$?: number;
+    $runWindowLoadEvent$?: number;
+    $isSameOrigin$?: boolean;
+    $isTopWindow$?: boolean;
+    $propagateHistoryChange$?: boolean;
+}
+export interface MembersInterfaceTypeInfo {
+    [memberName: string]: InterfaceType;
+}
+export declare const enum InterfaceType {
+    Window = 0,
+    Element = 1,
+    AttributeNode = 2,
+    TextNode = 3,
+    CDataSectionNode = 4,
+    Function = 5,
+    Property = 6,
+    ProcessingInstructionNode = 7,
+    CommentNode = 8,
+    Document = 9,
+    DocumentTypeNode = 10,
+    DocumentFragmentNode = 11,
+    EnvGlobalConstructor = 12
+}
+export declare const enum WinDocId {
+    document = "d",
+    documentElement = "e",
+    head = "h",
+    body = "b"
+}
+export interface InitializeScriptData {
+    $winId$: WinId;
+    $instanceId$: InstanceId;
+    $content$?: string;
+    $url$?: string;
+    $orgUrl$?: string;
+}
+export interface MainAccessRequest {
+    $msgId$: string;
+    $tasks$: MainAccessTask[];
+}
+export interface MainAccessTask {
+    $winId$: WinId;
+    $instanceId$: InstanceId;
+    $applyPath$: ApplyPath;
+    $groupedGetters$?: string[];
+    $assignInstanceId$?: AssignInstanceId;
+    $debug$?: string;
+}
+export interface MainAccessResponse {
+    $msgId$: string;
+    $error$?: string;
+    $rtnValue$?: SerializedTransfer;
+    $isPromise$?: any;
+}
+export declare const enum ApplyPathType {
+    SetValue = 0,
+    GlobalConstructor = 1
+}
+export declare type ApplyPath = any[];
+export declare const enum SerializedType {
+    Primitive = 0,
+    Array = 1,
+    Object = 2,
+    Instance = 3,
+    Ref = 4,
+    Event = 5,
+    Function = 6,
+    NodeList = 7,
+    ArrayBuffer = 8,
+    ArrayBufferView = 9,
+    Attr = 10,
+    CSSRule = 11,
+    CSSRuleList = 12,
+    CSSStyleDeclaration = 13,
+    Error = 14
+}
+export declare type SerializedArrayTransfer = [SerializedType.Array, (SerializedTransfer | undefined)[]];
+export declare type SerializedArrayBufferTransfer = [SerializedType.ArrayBuffer, any];
+export declare type SerializedArrayBufferViewTransfer = [SerializedType.ArrayBufferView, any, string];
+export declare type SerializedAttrTransfer = [SerializedType.Attr, SerializedAttr];
+export declare type SerializedCSSRuleTransfer = [SerializedType.CSSRule, SerializedCSSRule];
+export declare type SerializedCSSRuleListTransfer = [SerializedType.CSSRuleList, SerializedCSSRule[]];
+export declare type SerializedCSSStyleDeclarationTransfer = [
+    SerializedType.CSSStyleDeclaration,
+    {
+        [key: string]: SerializedTransfer | undefined;
+    }
+];
+export declare type SerializedErrorTransfer = [SerializedType.Error, Error];
+export declare type SerializedEventTransfer = [SerializedType.Event, SerializedObject];
+export declare type SerializedFunctionTransfer = [SerializedType.Function];
+export declare type SerializedInstanceTransfer = [SerializedType.Instance, SerializedInstance];
+export declare type SerializedNodeListTransfer = [
+    SerializedType.NodeList,
+    (SerializedTransfer | undefined)[]
+];
+export declare type SerializedObjectTransfer = [
+    SerializedType.Object,
+    {
+        [key: string]: SerializedTransfer | undefined;
+    }
+];
+export declare type SerializedAttr = [string, string];
+export declare type SerializedCSSRule = {
+    [key: string]: string;
+};
+export declare type SerializedPrimitiveTransfer = [SerializedType.Primitive, string | number | boolean | null | undefined] | [SerializedType.Primitive];
+export declare type SerializedRefTransfer = [SerializedType.Ref, SerializedRefTransferData];
+export interface SerializedRefTransferData {
+    $winId$: WinId;
+    $instanceId$: InstanceId;
+    $refId$: RefId;
+    $nodeName$?: string;
+}
+export declare type SerializedTransfer = SerializedArrayTransfer | SerializedArrayBufferTransfer | SerializedArrayBufferViewTransfer | SerializedAttrTransfer | SerializedCSSRuleTransfer | SerializedCSSRuleListTransfer | SerializedCSSStyleDeclarationTransfer | SerializedEventTransfer | SerializedFunctionTransfer | SerializedInstanceTransfer | SerializedNodeListTransfer | SerializedObjectTransfer | SerializedPrimitiveTransfer | SerializedRefTransfer | SerializedErrorTransfer | [];
+export interface SerializedObject {
+    [key: string]: SerializedTransfer | undefined;
+}
+export declare type SerializedInstance = [type: WinId, type: InstanceId] | [
+    type: WinId,
+    type: InstanceId,
+    /**
+     * Node name for Node instances
+     */
+    type: string
+];
+/**
+ * @public
+ */
+export declare type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe';
+/**
+ * https://partytown.builder.io/configuration
+ *
+ * @public
+ */
+export interface PartytownConfig {
+    /**
+     * The `resolveUrl()` hook can be used to modify the URL about to be
+     * requested, which could be used to rewrite urls so they go through a proxy.
+     *
+     * https://partytown.builder.io/proxying-requests
+     *
+     * @param url - The URL to be resolved. This is a URL https://developer.mozilla.org/en-US/docs/Web/API/URL, not a string.
+     * @param location - The current window location.
+     * @param type - The type of resource the url is being resolved for. For example, `fetch` is the value when resolving for `fetch()`, and `a` would be the value when resolving for an anchor element's `href`.
+     * @returns The returned value must be a URL interface, otherwise the default resolved URL is used.
+     */
+    resolveUrl?(url: URL, location: Location, type: ResolveUrlType): URL | undefined | null;
+    /**
+     * When set to `true`, Partytown scripts are not inlined and not minified.
+     *
+     * https://partytown.builder.io/debugging
+     */
+    debug?: boolean;
+    /**
+     * Many third-party scripts provide a global variable which user code calls
+     * in order to send data to the service. For example, Google Tag Manager uses
+     * a [Data Layer](https://developers.google.com/tag-manager/devguide) array,
+     * and by pushing data to the array, the data is then sent on to GTM. Because
+     * we're moving third-party scripts to a web worker, the main thread needs to
+     * know which variables to patch first, and when Partytown loads, it can then
+     * forward the event data on to the service.
+     *
+     * Below is an example of Google Tag Manager and Facebook Pixel:
+     *
+     * ```js
+     * ['dataLayer.push', 'fbq']
+     * ```
+     *
+     * https://partytown.builder.io/forwarding-events
+     */
+    forward?: PartytownForwardProperty[];
+    mainWindowAccessors?: string[];
+    /**
+     * Rarely, a script will add a named function to the global scope with the
+     * intent that other scripts can call the named function (like Adobe Launch).
+     * Due to how Partytown scopes each script, these named functions do not get
+     * added to `window`. The `globalFns` config can be used to manually ensure
+     * each function is added to the global scope. Consider this an escape hatch
+     * when a third-party script rudely pollutes `window` with functions.
+     */
+    globalFns?: string[];
+    /**
+     * This array can be used to filter which script are executed via
+     * Partytown and which you would like to execute on the main thread.
+     *
+     * @example loadScriptsOnMainThread:['https://test.com/analytics.js', 'inline-script-id']
+     * // Loads the `https://test.com/analytics.js` script on the main thread
+     */
+    loadScriptsOnMainThread?: string[];
+    get?: GetHook;
+    set?: SetHook;
+    apply?: ApplyHook;
+    /**
+     * An absolute path to the root directory which Partytown library files
+     * can be found. The library path must start and end with a `/`.
+     * By default the files will load from the server's `/~partytown/` directory.
+     * Note that the library path must be on the same origin as the html document,
+     * and is also used as the `scope` of the Partytown service worker.
+     */
+    lib?: string;
+    /**
+     * Log method calls (debug mode required)
+     */
+    logCalls?: boolean;
+    /**
+     * Log getter calls (debug mode required)
+     */
+    logGetters?: boolean;
+    /**
+     * Log setter calls (debug mode required)
+     */
+    logSetters?: boolean;
+    /**
+     * Log Image() src requests (debug mode required)
+     */
+    logImageRequests?: boolean;
+    /**
+     * Log calls to main access, which also shows how many tasks were sent per message (debug mode required)
+     */
+    logMainAccess?: boolean;
+    /**
+     * Log script executions (debug mode required)
+     */
+    logScriptExecution?: boolean;
+    /**
+     * Log navigator.sendBeacon() requests (debug mode required)
+     */
+    logSendBeaconRequests?: boolean;
+    /**
+     * Log stack traces (debug mode required)
+     */
+    logStackTraces?: boolean;
+    /**
+     * Path to the service worker file. Defaults to `partytown-sw.js`.
+     */
+    swPath?: string;
+}
+/**
+ * A foward property to patch on `window`. The foward config property is an string,
+ * representing the call to forward, such as `dataLayer.push` or `fbq`.
+ *
+ * https://partytown.builder.io/forwarding-events
+ *
+ * @public
+ */
+export declare type PartytownForwardProperty = string;
+/**
+ * @public
+ */
+export declare type GetHook = (opts: GetHookOptions) => any;
+/**
+ * @public
+ */
+export declare type SetHook = (opts: SetHookOptions) => any;
+/**
+ * @public
+ */
+export declare type ApplyHook = (opts: ApplyHookOptions) => any;
+export interface HookOptions {
+    name: string;
+    continue: Symbol;
+    nodeName: string | undefined;
+    constructor: string | undefined;
+}
+/**
+ * @public
+ */
+export interface GetHookOptions extends HookOptions {
+}
+/**
+ * @public
+ */
+export interface SetHookOptions extends HookOptions {
+    value: any;
+    prevent: Symbol;
+}
+/**
+ * @public
+ */
+export interface ApplyHookOptions extends HookOptions {
+    args: any[];
+}
+export interface MainWindow extends Window {
+    partytown?: PartytownConfig;
+    _ptf?: any[];
+}
+export declare const enum NodeName {
+    Body = "BODY",
+    Comment = "#comment",
+    Document = "#document",
+    /**
+     * <html>
+     */
+    DocumentElement = "HTML",
+    /**
+     * <!DOCTYPE html>
+     */
+    DocumentTypeNode = "html",
+    DocumentFragment = "#document-fragment",
+    IFrame = "IFRAME",
+    Head = "HEAD",
+    Script = "SCRIPT",
+    Text = "#text"
+}
+export declare const enum StateProp {
+    errorHandlers = "error",
+    loadHandlers = "load",
+    src = 0,
+    loadErrorStatus = 1,
+    cssRules = 2,
+    innerHTML = 3,
+    url = 4,
+    type = 5
+}
+export declare type EventHandler = (ev: any) => void;
+export declare type RefHandler = (...args: any[]) => void;
+export declare type StateMap = Record<number, StateRecord>;
+export declare type StateRecord = Record<string | number, any>;
+export declare type StorageItem = [/*key*/ string, /*value*/ string];
+export declare const enum CallType {
+    Blocking = 1,
+    NonBlocking = 2,
+    NonBlockingNoSideEffect = 3
+}
+export declare type Getter = (instance: any, applyPath: ApplyPath, groupedGetters?: string[]) => any;
+export declare type Setter = (instance: any, applyPath: ApplyPath, value: any) => void;
+export declare type CallMethod = (instance: any, applyPath: ApplyPath, args: any[], callType?: CallType, assignInstanceId?: AssignInstanceId, buffer?: ArrayBuffer | ArrayBufferView) => any;
+export declare type ConstructGlobal = (instance: any, cstrName: string, args: any[]) => void;
+export declare type DefinePrototypePropertyDescriptor = (Cstr: any, propertyDescriptorMap: any) => void;
+export declare type RandomId = () => string;
+import type { ApplyPathKey, InstanceDataKey, InstanceIdKey, InstanceStateKey, NamespaceKey, WinIdKey } from './web-worker/worker-constants';
+export declare type LazyBridge = [
+    Getter,
+    Setter,
+    CallMethod,
+    ConstructGlobal,
+    DefinePrototypePropertyDescriptor,
+    RandomId,
+    typeof WinIdKey,
+    typeof InstanceIdKey,
+    typeof ApplyPathKey
+];
+export declare type InitWindowMedia = (WorkerBase: WorkerConstructor, WorkerEventTargetProxy: WorkerConstructor, env: WebWorkerEnvironment, win: WorkerWindow, windowMediaConstructors: string[]) => any;
+export interface MediaSelf {
+    $bridgeToMedia$?: LazyBridge;
+    $bridgeFromMedia$?: InitWindowMedia;
+}
+export interface PostMessageData {
+    $winId$: WinId;
+    $data$: string;
+}
+export interface WorkerConstructor {
+    new (winId?: WinId, instanceId?: InstanceId, applyPath?: ApplyPath, instanceData?: any, namespace?: string): WorkerInstance;
+}
+export interface WorkerInstance {
+    [WinIdKey]: WinId;
+    [InstanceIdKey]: InstanceId;
+    [ApplyPathKey]: string[];
+    [InstanceDataKey]: string | undefined;
+    [NamespaceKey]: string | undefined;
+    [InstanceStateKey]: {
+        [key: string]: any;
+    };
+}
+export interface WorkerNode extends WorkerInstance, Node {
+    type: string | undefined;
+}
+export interface WorkerWindow extends WorkerInstance {
+    [key: string]: any;
+}
+export interface WorkerNodeConstructors {
+    [tagName: string]: WorkerConstructor;
+}
+export declare type CustomElementData = [cstrName: string, observedAttributes: string[]];

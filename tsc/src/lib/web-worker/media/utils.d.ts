@@ -1,0 +1,11 @@
+import type { WorkerWindow } from '../../types';
+export declare const ContextKey: unique symbol;
+export declare const MediaSourceKey: unique symbol;
+export declare const ReadyStateKey: unique symbol;
+export declare const SourceBuffersKey: unique symbol;
+export declare const SourceBufferTasksKey: unique symbol;
+export declare const TimeRangesKey: unique symbol;
+export declare const EMPTY_ARRAY: never[];
+export declare const defineCstr: (win: WorkerWindow, cstrName: string, Cstr: any) => any;
+export declare const defineCstrName: (cstrName: string, Cstr: any) => any;
+export declare const notImpl: (api: string) => void;
