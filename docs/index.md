@@ -5,7 +5,7 @@ description: Partytown - Run third-party scripts from a web worker
 
 Partytown is a lazy-loaded library to help relocate resource intensive scripts into a [web worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API), and off of the [main thread](https://developer.mozilla.org/en-US/docs/Glossary/Main_thread). Its goal is to help speed up sites by dedicating the main thread to your code, and offloading third-party scripts to a web worker.
 
-Even with a fast and highly tuned following all of today's best practices, it's all too common for your performance wins to be erased the moment third-party scripts are added. By third-party scripts we mean code that is embedded within your site, but not directly under your control. A few examples include: analytics, metrics, ads, A/B testing, trackers, etc.
+Even with a fast and highly tuned website following all of today's best practices, it's all too common for your performance wins to be erased the moment third-party scripts are added. By third-party scripts we mean code that is embedded within your site, but not directly under your control. A few examples include: analytics, metrics, ads, A/B testing, trackers, etc.
 
 Partytown is maintained by [Builder.io](https://www.builder.io/) and is currently in [Beta](https://www.builder.io/blog/partytown-is-now-in-beta).
 
@@ -16,7 +16,7 @@ Partytown is maintained by [Builder.io](https://www.builder.io/) and is currentl
 We set out to solve this situation, so that apps of all sizes will be able to continue to use third-party scripts without the performance hit. Some of Partytown's goals include:
 
 - Free up main thread resources to be used only for the primary web app execution.
-- Sandbox third-party scripts and allow or deny their access main thread APIs.
+- Sandbox third-party scripts and allow or deny their access to main thread APIs.
 - Isolate long-running tasks within the web worker thread.
 - Reduce layout thrashing coming from third-party scripts by batching DOM setters/getter into group updates.
 - Throttle third-party scripts' access to the main thread.

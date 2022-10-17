@@ -83,12 +83,12 @@ export const enum LocationUpdateType {
   PushState,
   ReplaceState,
   PopState,
-  HashChange
+  HashChange,
 }
 
 export interface LocationUpdateData {
   $winId$: WinId;
-  type: LocationUpdateType,
+  type: LocationUpdateType;
   state: object;
   url: string;
   newUrl?: string;
@@ -283,6 +283,7 @@ export const enum SerializedType {
   CSSRule,
   CSSRuleList,
   CSSStyleDeclaration,
+  Error,
 }
 
 export type SerializedArrayTransfer = [SerializedType.Array, (SerializedTransfer | undefined)[]];
@@ -301,6 +302,8 @@ export type SerializedCSSStyleDeclarationTransfer = [
   SerializedType.CSSStyleDeclaration,
   { [key: string]: SerializedTransfer | undefined }
 ];
+
+export type SerializedErrorTransfer = [SerializedType.Error, Error];
 
 export type SerializedEventTransfer = [SerializedType.Event, SerializedObject];
 
@@ -350,6 +353,7 @@ export type SerializedTransfer =
   | SerializedObjectTransfer
   | SerializedPrimitiveTransfer
   | SerializedRefTransfer
+  | SerializedErrorTransfer
   | [];
 
 export interface SerializedObject {
@@ -368,6 +372,11 @@ export type SerializedInstance =
     ];
 
 /**
+ * @public
+ */
+export type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe';
+
+/**
  * https://partytown.builder.io/configuration
  *
  * @public
@@ -381,9 +390,10 @@ export interface PartytownConfig {
    *
    * @param url - The URL to be resolved. This is a URL https://developer.mozilla.org/en-US/docs/Web/API/URL, not a string.
    * @param location - The current window location.
+   * @param type - The type of resource the url is being resolved for. For example, `fetch` is the value when resolving for `fetch()`, and `a` would be the value when resolving for an anchor element's `href`.
    * @returns The returned value must be a URL interface, otherwise the default resolved URL is used.
    */
-  resolveUrl?(url: URL, location: Location): URL | undefined | null;
+  resolveUrl?(url: URL, location: Location, type: ResolveUrlType): URL | undefined | null;
   /**
    * When set to `true`, Partytown scripts are not inlined and not minified.
    *
@@ -418,6 +428,14 @@ export interface PartytownConfig {
    * when a third-party script rudely pollutes `window` with functions.
    */
   globalFns?: string[];
+  /**
+   * This array can be used to filter which script are executed via
+   * Partytown and which you would like to execute on the main thread.
+   *
+   * @example loadScriptsOnMainThread:['https://test.com/analytics.js', 'inline-script-id']
+   * // Loads the `https://test.com/analytics.js` script on the main thread
+   */
+  loadScriptsOnMainThread?: string[];
   get?: GetHook;
   set?: SetHook;
   apply?: ApplyHook;
@@ -647,7 +665,9 @@ export interface WorkerInstance {
   [InstanceStateKey]: { [key: string]: any };
 }
 
-export interface WorkerNode extends WorkerInstance, Node {}
+export interface WorkerNode extends WorkerInstance, Node {
+  type: string | undefined;
+}
 
 export interface WorkerWindow extends WorkerInstance {
   [key: string]: any;

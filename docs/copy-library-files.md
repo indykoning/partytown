@@ -32,8 +32,8 @@ This command can be used before a build script. Below is an example of copying t
 The same code that the `partytown copylib` CLI task uses, is also exposed as an API and can be imported by any NodeJS script. Below is an example of importing the `@builder.io/partytown/utils` API and copying the lib files to the given directory. Both examples of an ESM import or CommonJS require should work.
 
 ```js
-import { copyLibFiles } from 'builder.io/partytown/utils'; // ESM
-// const { copyLibFiles } = require('builder.io/partytown/utils'); // CommonJS
+import { copyLibFiles } from '@builder.io/partytown/utils'; // ESM
+// const { copyLibFiles } = require('@builder.io/partytown/utils'); // CommonJS
 
 async function myBuildTask() {
   await copyLibFiles('path/to/public/~partytown');
@@ -102,14 +102,12 @@ const partytown = require('@builder.io/partytown/utils');
 
 module.exports = {
   plugins: [
-    new CopyPlugin({
-      patterns: [
+    new CopyPlugin([
         {
           from: partytown.libDirPath(),
           to: path.join(__dirname, 'public', '~partytown'),
         },
-      ],
-    }),
+      ]),
   ],
 };
 ```
