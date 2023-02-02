@@ -374,7 +374,7 @@ export type SerializedInstance =
 /**
  * @public
  */
-export type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe';
+export type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe' | 'image';
 
 /**
  * https://partytown.builder.io/configuration
@@ -515,6 +515,8 @@ export interface HookOptions {
   continue: Symbol;
   nodeName: string | undefined;
   constructor: string | undefined;
+  instance: WorkerInstance;
+  window: Window;
 }
 
 /**

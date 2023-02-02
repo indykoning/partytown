@@ -75,6 +75,7 @@ import { patchHTMLScriptElement } from './worker-script';
 import { patchSvgElement } from './worker-svg';
 import { resolveUrl } from './worker-exec';
 import { createNodeListCstr } from './worker-serialization';
+import { createNamedNodeMapCstr } from './worker-named-node-map';
 
 // FIXME: move this to some better place
 class TagAssistantApi {
@@ -274,6 +275,7 @@ export const createWindow = (
 
         createNodeCstr(win, env, WorkerBase);
         createNodeListCstr(win);
+        createNamedNodeMapCstr(win, WorkerBase);
         createCSSStyleDeclarationCstr(win, WorkerBase, 'CSSStyleDeclaration');
         createPerformanceConstructor(win, WorkerBase, 'Performance');
         createCustomElementRegistry(win, nodeCstrs);

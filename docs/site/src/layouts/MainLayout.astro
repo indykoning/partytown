@@ -11,6 +11,27 @@ import * as CONFIG from '../config';
 const { content = {} } = Astro.props;
 const currentPage = new URL(Astro.request.url).pathname;
 const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}${currentPage === '/' ? '/index' : currentPage}.md`;
+
+const apiKey = `YJIGb4i01jvw0SRdL5Bt`;  // ggignore
+
+const handleError = (err: any) => {
+  console.log(err);
+  // The requested Builder content could not be found.
+  if (err.response.status === 404) {
+    return { data: null };
+  }
+  throw err;
+};
+
+const url = new URL('https://cdn.builder.io/api/v1/qwik/oss-top-bar');
+url.searchParams.set('apiKey', apiKey);
+url.searchParams.set('userAttributes.site', 'partytown.builder.io');
+url.searchParams.set('userAttributes.url', new URL(Astro.request.url).pathname);
+url.searchParams.set('cachebust', 'true');
+const qwikPageData = await fetch(url.toString())
+  .then((res) => res.json())
+  .catch(handleError);
+
 ---
 
 <html dir={content.dir ?? 'ltr'} lang={content.lang ?? 'en-us'} class="initial">
@@ -110,6 +131,7 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}${currentPage === '/' ? '/index'
 	</head>
 
 	<body>
+	  <div set:html={qwikPageData.html}></div>
 		<Header {currentPage} />
 		<main class="layout">
 			<aside id="grid-left" class="grid-sidebar" title="Site Navigation">
