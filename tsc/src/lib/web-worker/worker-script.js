@@ -23,7 +23,7 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement, env) => {
                     setter(this, ['dataset', 'ptsrc'], orgUrl);
                 }
                 if (this.type && config.loadScriptsOnMainThread) {
-                    const shouldExecuteScriptViaMainThread = config.loadScriptsOnMainThread.some(scriptUrl => scriptUrl === url);
+                    const shouldExecuteScriptViaMainThread = config.loadScriptsOnMainThread.some((scriptUrl) => scriptUrl === url);
                     if (shouldExecuteScriptViaMainThread) {
                         setter(this, ['type'], 'text/javascript');
                     }
@@ -48,7 +48,13 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement, env) => {
 };
 const innerHTMLDescriptor = {
     get() {
-        return getInstanceStateValue(this, 3 /* innerHTML */) || '';
+        const type = getter(this, ['type']);
+        if (isScriptJsType(type)) {
+            return getInstanceStateValue(this, 3 /* innerHTML */) || '';
+        }
+        else {
+            return getter(this, ['innerHTML']);
+        }
     },
     set(scriptContent) {
         setInstanceStateValue(this, 3 /* innerHTML */, scriptContent);

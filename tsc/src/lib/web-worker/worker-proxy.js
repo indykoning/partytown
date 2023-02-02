@@ -1,5 +1,5 @@
 import '../types';
-import { ApplyPathKey, cachedDimensions, cachedStructure, dimensionChangingMethodNames, dimensionChangingSetterNames, HookContinue, HookPrevent, InstanceDataKey, InstanceIdKey, nonBlockingMethods, structureChangingMethodNames, webWorkerCtx, WinIdKey, } from './worker-constants';
+import { ApplyPathKey, cachedDimensions, cachedStructure, dimensionChangingMethodNames, dimensionChangingSetterNames, environments, HookContinue, HookPrevent, InstanceDataKey, InstanceIdKey, nonBlockingMethods, structureChangingMethodNames, webWorkerCtx, WinIdKey, } from './worker-constants';
 import { debug, getConstructorName, len, randomId } from '../utils';
 import { deserializeFromMain, serializeInstanceForMain } from './worker-serialization';
 import { hasInstanceStateValue, setInstanceStateValue } from './worker-state';
@@ -142,4 +142,6 @@ const createHookOptions = (instance, applyPath) => ({
     continue: HookContinue,
     nodeName: instance[InstanceDataKey],
     constructor: getConstructorName(instance),
+    instance,
+    window: environments[instance[WinIdKey]].$window$,
 });

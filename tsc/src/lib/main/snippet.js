@@ -80,6 +80,12 @@ export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout
             console.warn(`Partytown script fallback`);
         }
         clearFallback();
+        // remove any previously patched functions
+        if (top == win) {
+            (config.forward || []).map(function (forwardProps) {
+                delete win[forwardProps.split('.')[0]];
+            });
+        }
         for (i = 0; i < scripts.length; i++) {
             script = doc.createElement('script');
             script.innerHTML = scripts[i].innerHTML;

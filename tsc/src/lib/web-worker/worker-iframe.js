@@ -47,10 +47,7 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement, env) => {
                     xhrStatus = xhr.status;
                     if (xhrStatus > 199 && xhrStatus < 300) {
                         setter(this, ['srcdoc'], `<base href="${src}">` +
-                            xhr.responseText
-                                .replace(/<script>/g, `<script type="${SCRIPT_TYPE}">`)
-                                .replace(/<script /g, `<script type="${SCRIPT_TYPE}" `)
-                                .replace(/text\/javascript/g, SCRIPT_TYPE) +
+                            replaceScriptWithPartytownScript(xhr.responseText) +
                             getPartytownScript());
                         sendToMain(true);
                         webWorkerCtx.$postMessage$([7 /* InitializeNextScript */, env.$winId$]);
@@ -66,6 +63,28 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement, env) => {
     };
     definePrototypePropertyDescriptor(WorkerHTMLIFrameElement, HTMLIFrameDescriptorMap);
 };
+const ATTR_REGEXP_STR = `((?:\\w|-)+(?:=(?:(?:\\w|-)+|'[^']*'|"[^"]*")?)?)`;
+const SCRIPT_TAG_REGEXP = new RegExp(`<script\\s*((${ATTR_REGEXP_STR}\\s*)*)>`, 'mg');
+const ATTR_REGEXP = new RegExp(ATTR_REGEXP_STR, 'mg');
+export function replaceScriptWithPartytownScript(text) {
+    return text.replace(SCRIPT_TAG_REGEXP, (_, attrs) => {
+        const parts = [];
+        let hasType = false;
+        let match;
+        while ((match = ATTR_REGEXP.exec(attrs))) {
+            let [keyValue] = match;
+            if (keyValue.startsWith('type=')) {
+                hasType = true;
+                keyValue = keyValue.replace(/(application|text)\/javascript/, SCRIPT_TYPE);
+            }
+            parts.push(keyValue);
+        }
+        if (!hasType) {
+            parts.push('type="' + SCRIPT_TYPE + '"');
+        }
+        return `<script ${parts.join(' ')}>`;
+    });
+}
 const getIframeEnv = (iframe) => {
     // the winId of an iframe's contentWindow is the same
     // as the instanceId of the containing iframe element

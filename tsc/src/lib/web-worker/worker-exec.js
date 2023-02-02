@@ -15,14 +15,16 @@ export const initNextScriptsInWebWorker = async (initScript) => {
     let errorMsg = '';
     let env = environments[winId];
     let rsp;
-    let javascriptContentTypes = ["text/jscript",
-        "text/javascript",
-        "text/x-javascript",
-        "application/javascript",
-        "application/x-javascript",
-        "text/ecmascript",
-        "text/x-ecmascript",
-        "application/ecmascript"];
+    let javascriptContentTypes = [
+        'text/jscript',
+        'text/javascript',
+        'text/x-javascript',
+        'application/javascript',
+        'application/x-javascript',
+        'text/ecmascript',
+        'text/x-ecmascript',
+        'application/ecmascript',
+    ];
     if (scriptSrc) {
         try {
             scriptSrc = resolveToUrl(env, scriptSrc, 'script') + '';
@@ -32,8 +34,8 @@ export const initNextScriptsInWebWorker = async (initScript) => {
             }
             rsp = await fetch(scriptSrc);
             if (rsp.ok) {
-                let responseContentType = rsp.headers.get("content-type");
-                let shouldExecute = javascriptContentTypes.some(ct => { var _a, _b, _c; return (_c = (_a = responseContentType === null || responseContentType === void 0 ? void 0 : responseContentType.toLowerCase) === null || _a === void 0 ? void 0 : (_b = _a.call(responseContentType)).includes) === null || _c === void 0 ? void 0 : _c.call(_b, ct); });
+                let responseContentType = rsp.headers.get('content-type');
+                let shouldExecute = javascriptContentTypes.some((ct) => { var _a, _b, _c; return (_c = (_a = responseContentType === null || responseContentType === void 0 ? void 0 : responseContentType.toLowerCase) === null || _a === void 0 ? void 0 : (_b = _a.call(responseContentType)).includes) === null || _c === void 0 ? void 0 : _c.call(_b, ct); });
                 if (shouldExecute) {
                     scriptContent = await rsp.text();
                     env.$currentScriptId$ = instanceId;
@@ -87,7 +89,9 @@ export const runScriptContent = (env, instanceId, scriptContent, winId, errorMsg
 export const run = (env, scriptContent, scriptUrl) => {
     env.$runWindowLoadEvent$ = 1;
     scriptContent =
-        `with(this){${scriptContent.replace(/\bthis\b/g, '(thi$(this)?window:this)').replace(/\/\/# so/g, '//Xso')}\n;function thi$(t){return t===this}};${(webWorkerCtx.$config$.globalFns || [])
+        `with(this){${scriptContent
+            .replace(/\bthis\b/g, '(thi$(this)?window:this)')
+            .replace(/\/\/# so/g, '//Xso')}\n;function thi$(t){return t===this}};${(webWorkerCtx.$config$.globalFns || [])
             .filter((globalFnName) => /[a-zA-Z_$][0-9a-zA-Z_$]*/.test(globalFnName))
             .map((g) => `(typeof ${g}=='function'&&(this.${g}=${g}))`)
             .join(';')};` + (scriptUrl ? '\n//# sourceURL=' + scriptUrl : '');

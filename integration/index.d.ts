@@ -10,6 +10,8 @@ declare interface ApplyHookOptions extends HookOptions {
     args: any[];
 }
 
+declare const ApplyPathKey: unique symbol;
+
 /**
  * @public
  */
@@ -26,7 +28,19 @@ declare interface HookOptions {
     continue: Symbol;
     nodeName: string | undefined;
     constructor: string | undefined;
+    instance: WorkerInstance;
+    window: Window;
 }
+
+declare const InstanceDataKey: unique symbol;
+
+declare type InstanceId = string;
+
+declare const InstanceIdKey: unique symbol;
+
+declare const InstanceStateKey: unique symbol;
+
+declare const NamespaceKey: unique symbol;
 
 /**
  * https://partytown.builder.io/configuration
@@ -158,7 +172,7 @@ export declare const partytownSnippet: (config?: PartytownConfig | undefined) =>
 /**
  * @public
  */
-export declare type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe';
+export declare type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe' | 'image';
 
 /**
  * The `type` attribute for Partytown scripts, which does two things:
@@ -181,6 +195,21 @@ export declare type SetHook = (opts: SetHookOptions) => any;
 declare interface SetHookOptions extends HookOptions {
     value: any;
     prevent: Symbol;
+}
+
+declare type WinId = string;
+
+declare const WinIdKey: unique symbol;
+
+declare interface WorkerInstance {
+    [WinIdKey]: WinId;
+    [InstanceIdKey]: InstanceId;
+    [ApplyPathKey]: string[];
+    [InstanceDataKey]: string | undefined;
+    [NamespaceKey]: string | undefined;
+    [InstanceStateKey]: {
+        [key: string]: any;
+    };
 }
 
 export { }

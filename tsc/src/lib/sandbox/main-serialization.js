@@ -23,11 +23,14 @@ export const serializeForWorker = ($winId$, value, added, type, cstrName) => {
         }
         else if (type === 'object') {
             if (serializedValueIsError(value)) {
-                return [14 /* Error */, {
+                return [
+                    14 /* Error */,
+                    {
                         name: value.name,
                         message: value.message,
-                        stack: value.stack
-                    }];
+                        stack: value.stack,
+                    },
+                ];
             }
             else if ((cstrName = getConstructorName(value)) === '') {
                 // error reading this object, probably "DOMException: Blocked from accessing a cross-origin frame."
@@ -84,7 +87,7 @@ const serializeObjectForWorker = (winId, obj, added, includeFunctions, includeEm
         added.add(obj);
         for (propName in obj) {
             if (isValidMemberName(propName)) {
-                if (propName === 'path' && obj instanceof Event) {
+                if (propName === 'path' && getConstructorName(obj).endsWith('Event')) {
                     propValue = obj.composedPath();
                 }
                 else {

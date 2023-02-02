@@ -1,4 +1,4 @@
-import "../types";
+import '../types';
 export function forwardLocationChange($winId$, env, data) {
     const history = env.$window$.history;
     switch (data.type) {
