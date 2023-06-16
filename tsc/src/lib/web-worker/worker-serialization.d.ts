@@ -2,7 +2,7 @@ import { ApplyPath, InstanceId, RefHandlerCallbackData, SerializedInstance, Seri
 export declare const serializeForMain: ($winId$: WinId, $instanceId$: InstanceId, value: any, added?: Set<any> | undefined, type?: string | undefined) => SerializedTransfer | undefined;
 export declare const serializeInstanceForMain: (instance: any, value: any) => SerializedTransfer | undefined;
 export declare const deserializeFromMain: (winId: WinId | undefined | null, instanceId: InstanceId | undefined | null, applyPath: ApplyPath, serializedValueTransfer?: SerializedTransfer | undefined, serializedType?: SerializedType | undefined, serializedValue?: any, obj?: any, key?: string | undefined) => any;
-export declare const getOrCreateSerializedInstance: ([winId, instanceId, nodeName,]: SerializedInstance) => any;
+export declare const getOrCreateSerializedInstance: ([winId, instanceId, nodeName, prevInstanceId]: SerializedInstance) => any;
 export declare const callWorkerRefHandler: ({ $winId$, $instanceId$, $refId$, $thisArg$, $args$, }: RefHandlerCallbackData) => void;
 export declare class NodeList {
     private _;

@@ -67,7 +67,7 @@ export const mainAccessHandler = async (worker, accessReq) => {
                         }
                     }
                     if (isLast) {
-                        accessRsp.$rtnValue$ = serializeForWorker(winId, rtnValue);
+                        accessRsp.$rtnValue$ = serializeForWorker(winId, rtnValue, undefined, undefined, undefined, task.$instanceId$);
                     }
                 }
                 else {

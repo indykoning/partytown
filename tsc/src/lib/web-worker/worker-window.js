@@ -83,6 +83,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
     let cstrInstanceId;
     let cstrNodeName;
     let cstrNamespace;
+    let cstrPrevInstance;
     // base class all Nodes/Elements/Global Constructors will extend
     const WorkerBase = class {
         constructor(winId, instanceId, applyPath, instanceData, namespace) {
@@ -91,7 +92,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
             this[ApplyPathKey] = applyPath || [];
             this[InstanceDataKey] = instanceData || cstrNodeName;
             this[NamespaceKey] = namespace || cstrNamespace;
-            this[InstanceStateKey] = {};
+            this[InstanceStateKey] = cstrPrevInstance && cstrPrevInstance[InstanceStateKey] || {};
             cstrInstanceId = cstrNodeName = cstrNamespace = undefined;
         }
     };
@@ -137,7 +138,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
                 }
             };
             let nodeCstrs = {};
-            let $createNode$ = (nodeName, instanceId, namespace) => {
+            let $createNode$ = (nodeName, instanceId, namespace, prevInstance) => {
                 if (htmlMedia.includes(nodeName)) {
                     initWindowMedia();
                 }
@@ -149,6 +150,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
                 cstrInstanceId = instanceId;
                 cstrNodeName = nodeName;
                 cstrNamespace = namespace;
+                cstrPrevInstance = prevInstance;
                 return new NodeCstr();
             };
             win.Window = WorkerWindow;

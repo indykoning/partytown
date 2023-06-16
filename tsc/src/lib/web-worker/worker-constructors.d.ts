@@ -1,5 +1,5 @@
 import type { InstanceId, WinId, WorkerNode } from '../types';
-export declare const getOrCreateNodeInstance: (winId: WinId, instanceId: InstanceId, nodeName?: string | undefined, namespace?: string | undefined, instance?: WorkerNode | undefined) => WorkerNode | undefined;
+export declare const getOrCreateNodeInstance: (winId: WinId, instanceId: InstanceId, nodeName?: string | undefined, namespace?: string | undefined, instance?: WorkerNode | undefined, prevInstanceId?: string | undefined) => WorkerNode | undefined;
 export declare const definePrototypeNodeType: (Cstr: any, nodeType: number) => any;
 export declare const cachedTreeProps: (Cstr: any, treeProps: string[]) => any[];
 /**

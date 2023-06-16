@@ -84,6 +84,11 @@ export declare interface PartytownConfig {
      * https://partytown.builder.io/forwarding-events
      */
     forward?: PartytownForwardProperty[];
+    /**
+     * The css selector where the sandbox should be placed.
+     * Default: body
+     */
+    sandboxParent?: string;
     mainWindowAccessors?: string[];
     /**
      * Rarely, a script will add a named function to the global scope with the

@@ -61,7 +61,6 @@ export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout
         }
     }
     function loadSandbox(isAtomics) {
-        var _a;
         sandbox = doc.createElement(isAtomics ? 'script' : 'iframe');
         if (!isAtomics) {
             sandbox.setAttribute('style', 'display:block;width:0;height:0;border:0;visibility:hidden');
@@ -71,8 +70,7 @@ export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout
             libPath +
                 'partytown-' +
                 (isAtomics ? 'atomics.js?v=_VERSION_' : 'sandbox-sw.html?' + Date.now());
-        let parent = (_a = doc.getElementById('partytown')) !== null && _a !== void 0 ? _a : doc.body;
-        parent.appendChild(sandbox);
+        doc.querySelector(config.sandboxParent || 'body').appendChild(sandbox);
     }
     function fallback(i, script) {
         // no support or timeout reached

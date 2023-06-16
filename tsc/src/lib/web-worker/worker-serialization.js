@@ -154,12 +154,12 @@ export const deserializeFromMain = (winId, instanceId, applyPath, serializedValu
         }
     }
 };
-export const getOrCreateSerializedInstance = ([winId, instanceId, nodeName,]) => {
+export const getOrCreateSerializedInstance = ([winId, instanceId, nodeName, prevInstanceId]) => {
     if (instanceId === winId && environments[winId]) {
         return environments[winId].$window$;
     }
     else {
-        return getOrCreateNodeInstance(winId, instanceId, nodeName);
+        return getOrCreateNodeInstance(winId, instanceId, nodeName, undefined, undefined, prevInstanceId);
     }
 };
 export const callWorkerRefHandler = ({ $winId$, $instanceId$, $refId$, $thisArg$, $args$, }) => {

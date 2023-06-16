@@ -2,10 +2,11 @@ import { cachedDimensions, cachedStructure, commaSplit, environments, getterDime
 import { callMethod, getter, setter } from './worker-proxy';
 import { definePrototypeProperty, definePrototypeValue, EMPTY_ARRAY } from '../utils';
 import { getInstanceStateValue, hasInstanceStateValue, setInstanceStateValue, } from './worker-state';
-export const getOrCreateNodeInstance = (winId, instanceId, nodeName, namespace, instance) => {
+export const getOrCreateNodeInstance = (winId, instanceId, nodeName, namespace, instance, prevInstanceId) => {
     instance = webWorkerInstances.get(instanceId);
     if (!instance && nodeName && environments[winId]) {
-        instance = environments[winId].$createNode$(nodeName, instanceId, namespace);
+        const prevInstance = webWorkerInstances.get(prevInstanceId || '');
+        instance = environments[winId].$createNode$(nodeName, instanceId, namespace, prevInstance);
         webWorkerInstances.set(instanceId, instance);
     }
     return instance;

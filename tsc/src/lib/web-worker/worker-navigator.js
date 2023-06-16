@@ -32,5 +32,10 @@ export const createNavigator = (env) => {
     for (key in navigator) {
         nav[key] = navigator[key];
     }
-    return nav;
+    return new Proxy(nav, {
+        set(_, propName, propValue) {
+            navigator[propName] = propValue;
+            return true;
+        },
+    });
 };

@@ -2,7 +2,7 @@ import { getConstructorName, getNodeName, isValidMemberName, startsWith } from '
 import { getInstance, getAndSetInstanceId } from './main-instances';
 import { mainRefs } from './main-constants';
 import '../types';
-export const serializeForWorker = ($winId$, value, added, type, cstrName) => {
+export const serializeForWorker = ($winId$, value, added, type, cstrName, prevInstanceId) => {
     if (value !== undefined && (type = typeof value)) {
         if (type === 'string' || type === 'number' || type === 'boolean' || value == null) {
             return [0 /* Primitive */, value];
@@ -66,7 +66,7 @@ export const serializeForWorker = ($winId$, value, added, type, cstrName) => {
             else if (value.nodeType) {
                 return [
                     3 /* Instance */,
-                    [$winId$, getAndSetInstanceId(value), getNodeName(value)],
+                    [$winId$, getAndSetInstanceId(value), getNodeName(value), prevInstanceId],
                 ];
             }
             else {
