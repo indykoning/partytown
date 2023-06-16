@@ -5,11 +5,14 @@ description: Partytown - Run third-party scripts from a web worker
 
 Partytown is a lazy-loaded library to help relocate resource intensive scripts into a [web worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API), and off of the [main thread](https://developer.mozilla.org/en-US/docs/Glossary/Main_thread). Its goal is to help speed up sites by dedicating the main thread to your code, and offloading third-party scripts to a web worker.
 
+> Note: Partytown is still in beta and not guaranteed to work in every scenario. Please see our [FAQ](/faq) and [Trade-Off](/trade-offs) sections for more info.
+
 Even with a fast and highly tuned website following all of today's best practices, it's all too common for your performance wins to be erased the moment third-party scripts are added. By third-party scripts we mean code that is embedded within your site, but not directly under your control. A few examples include: analytics, metrics, ads, A/B testing, trackers, etc.
 
 Partytown is maintained by [Builder.io](https://www.builder.io/) and is currently in [Beta](https://www.builder.io/blog/partytown-is-now-in-beta).
 
-[Smashing Magazine: How Partytown Eliminates Website Bloat From Third-Party Scripts](https://www.smashingmagazine.com/2022/04/partytown-eliminates-website-bloat-third-party-apps/)
+- [Partytown, Google Slides Presentation](https://docs.google.com/presentation/d/10aKHUokby6hQydL_xuOtct4CPwAkgay5l0-FqgO8-3g/edit?usp=sharing)
+- [Smashing Magazine: How Partytown Eliminates Website Bloat From Third-Party Scripts](https://www.smashingmagazine.com/2022/04/partytown-eliminates-website-bloat-third-party-apps/)
 
 ## Goals
 
@@ -47,7 +50,7 @@ Below is a summary of potential issues after add third-party scripts, referenced
 
 While full webapps "can" run from within Partytown, it's actually best intended for code that doesn't need to be in the [critical rendering path](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path). Most third-party scripts fall into this category, as they're not required for the first-paint. Additionally, the asynchronous nature of most third-party script works well with Partytown, as they can lazily receive user events and post data to their respective services.
 
-Below are just a few examples of third-party scripts that might be a good candidate to run from within a web worker. The goal is to continue validating commonly used services to ensure Partytown has the correct API, but Partytown itself does not hardcode to any specific services. Help us test and join the conversation in [Partytown's Discord](https://discord.gg/bNVSQmPzqy)!
+Below are just a few examples of third-party scripts that might be a good candidate to run from within a web worker. The goal is to continue validating commonly used services to ensure Partytown has the correct API, but Partytown itself does not hardcode to any specific services. Help us test and contribute to this page in Github when you find good working scripts!
 
 - [Google Tag Manager (GTM)](https://marketingplatform.google.com/about/tag-manager/)
 - [Google Analytics (GA)](https://analytics.google.com/)
@@ -61,7 +64,7 @@ Below are just a few examples of third-party scripts that might be a good candid
 
 We try and keep a list of all the plugins and libraries that we know of that works out-of-the-box in Partytown, but we would love your help as plugin & library authors and contributors to keep this list growing.
 
-We have [some documentation](https://github.com/BuilderIO/partytown/blob/main/DEVELOPER.md#plugin-authors--developers) on how you could create and check-in an integration test that shows how your library / plugin works on Partytown. And if it works, then we would love to have the configuration needed (if any) on our [Common Services page](/common-services)
+We have [some documentation](https://github.com/BuilderIO/partytown/blob/main/CONTRIBUTING.md#plugin-authors--developers) on how you could create and check-in an integration test that shows how your library / plugin works on Partytown. And if it works, then we would love to have the configuration needed (if any) on our [Common Services page](/common-services)
 
 ## Articles
 

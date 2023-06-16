@@ -187,7 +187,7 @@ export interface WebWorkerEnvironment {
   $body$: HTMLElement;
   $location$: Location;
   $visibilityState$?: string;
-  $createNode$: (nodeName: string, instanceId: InstanceId, namespace?: string) => WorkerNode;
+  $createNode$: (nodeName: string, instanceId: InstanceId, namespace?: string, prevInstance?: WorkerNode) => WorkerNode;
   $currentScriptId$?: InstanceId;
   $isInitialized$?: number;
   $isLoading$?: number;
@@ -368,7 +368,8 @@ export type SerializedInstance =
       /**
        * Node name for Node instances
        */
-      type: string
+      type: string,
+      type?: string
     ];
 
 /**
@@ -418,6 +419,11 @@ export interface PartytownConfig {
    * https://partytown.builder.io/forwarding-events
    */
   forward?: PartytownForwardProperty[];
+  /**
+   * The css selector where the sandbox should be placed.
+   * Default: body
+   */
+  sandboxParent?: string;
   mainWindowAccessors?: string[];
   /**
    * Rarely, a script will add a named function to the global scope with the

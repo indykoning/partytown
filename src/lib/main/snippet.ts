@@ -82,8 +82,8 @@ export function snippet(
       libPath +
       'partytown-' +
       (isAtomics ? 'atomics.js?v=_VERSION_' : 'sandbox-sw.html?' + Date.now());
-    let parent = doc.getElementById('partytown') ?? doc.body;
-    parent.appendChild(sandbox);
+
+    doc.querySelector(config!.sandboxParent || 'body')!.appendChild(sandbox);
   }
 
   function fallback(i?: number, script?: HTMLScriptElement) {

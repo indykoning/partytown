@@ -11,22 +11,24 @@
 
 Partytown is a lazy-loaded library to help relocate resource intensive scripts into a [web worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API), and off of the [main thread](https://developer.mozilla.org/en-US/docs/Glossary/Main_thread). Its goal is to help speed up sites by dedicating the main thread to your code, and offloading third-party scripts to a web worker.
 
+> Note: Partytown is still in beta and not guaranteed to work in every scenario. Please see our [FAQ](https://partytown.builder.io/faq) and [Trade-Off](https://partytown.builder.io/trade-offs) sections for more info.
+
 The philosophy is that the main thread should be dedicated to your code, and any scripts that are not required to be in the [critical path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path) should be moved to a web worker. Main thread performance is, without question, more important than web worker thread performance.
 
 - [Getting Started](https://partytown.builder.io/getting-started)
 - [Integrations](https://partytown.builder.io/integrations)
 - [Configuration](https://partytown.builder.io/configuration)
 - [Releases](https://github.com/BuilderIO/partytown/releases)
+- [FAQs](https://partytown.builder.io/faq)
 
 ![Without Partytown and With Partytown: Your code and third-party code compete for main thread resources](https://user-images.githubusercontent.com/452425/152393346-6f721a4f-3f66-410a-8878-a2b49e24307f.png)
 
 ## Community
 
-- [Partytown Discord](https://discord.gg/bNVSQmPzqy)
 - [@QwikDev](https://twitter.com/QwikDev)
 - [@Builderio](https://twitter.com/builderio)
-- [Local Development](https://github.com/BuilderIO/partytown/blob/main/DEVELOPER.md#local-development)
-- [For Plugin Authors / Developers](https://github.com/BuilderIO/partytown/blob/main/DEVELOPER.md#plugin-authors-developers)
+- [Local Development](https://github.com/BuilderIO/partytown/blob/main/CONTRIBUTING.md#local-development)
+- [For Plugin Authors / Developers](https://github.com/BuilderIO/partytown/blob/main/CONTRIBUTING.md#plugin-authors-developers)
 
 ## Related Projects
 
@@ -34,6 +36,13 @@ The philosophy is that the main thread should be dedicated to your code, and any
 - [Mitosis](https://github.com/BuilderIO/mitosis): Write components once, run everywhere. Compiles to Vue, React, Solid, Angular, Svelte, and more.
 - [Builder](https://github.com/BuilderIO/builder): Drag and drop page builder and CMS for React, Vue, Angular, and more.
 
----
-
-Made with ❤️ by [Builder.io](https://github.com/BuilderIO/)
+<br>
+<br>
+<p align="center">
+   <a href="https://www.builder.io/m/developers">
+      <picture>
+         <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/844291/230786554-eb225eeb-2f6b-4286-b8c2-535b1131744a.png">
+         <img width="250" alt="Made with love by Builder.io" src="https://user-images.githubusercontent.com/844291/230786555-a58479e4-75f3-4222-a6eb-74c5af953eac.png">
+       </picture>
+   </a>
+</p>
