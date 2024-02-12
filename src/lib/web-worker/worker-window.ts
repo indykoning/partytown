@@ -185,7 +185,7 @@ export const createWindow = (
       this[ApplyPathKey] = applyPath || [];
       this[InstanceDataKey] = instanceData || cstrNodeName;
       this[NamespaceKey] = namespace || cstrNamespace;
-      this[InstanceStateKey] = cstrPrevInstance && cstrPrevInstance[InstanceStateKey] || {};
+      this[InstanceStateKey] = (cstrPrevInstance && cstrPrevInstance[InstanceStateKey]) || {};
       cstrInstanceId = cstrNodeName = cstrNamespace = undefined;
     }
   };
@@ -255,7 +255,7 @@ export const createWindow = (
           nodeName: string,
           instanceId: InstanceId,
           namespace?: string,
-          prevInstance?: WorkerNode,
+          prevInstance?: WorkerNode
         ): WorkerNode => {
           if (htmlMedia.includes(nodeName)) {
             initWindowMedia();
@@ -269,7 +269,7 @@ export const createWindow = (
           cstrInstanceId = instanceId;
           cstrNodeName = nodeName;
           cstrNamespace = namespace;
-          cstrPrevInstance = prevInstance
+          cstrPrevInstance = prevInstance;
           return new NodeCstr() as any;
         };
 
@@ -540,7 +540,7 @@ export const createWindow = (
         win.Worker = undefined;
       }
 
-      addEventListener(...args: any[]) {
+      addEventListener = (...args: any[]) => {
         if (args[0] === 'load') {
           if (env.$runWindowLoadEvent$) {
             setTimeout(() => args[1]({ type: 'load' }));
@@ -548,7 +548,7 @@ export const createWindow = (
         } else {
           callMethod(this, ['addEventListener'], args, CallType.NonBlocking);
         }
-      }
+      };
 
       get body() {
         return env.$body$;

@@ -18,7 +18,7 @@
             proxyUrl.searchParams.append('url', url);
             return proxyUrl;
           }
-          
+
           return url;
         },
         forward: ['dataLayer.push'],
@@ -124,6 +124,11 @@
     </script>
 
     <p><a href="/tests/integrations/gtm/standard.html">Standard GTM</a></p>
+    <p>
+      <a href="/tests/integrations/gtm/preserve-behavior.html"
+        >Partytown GTM with preserveBehavior</a
+      >
+    </p>
     <p><a href="/tests/">All Tests</a></p>
   </body>
 </html>

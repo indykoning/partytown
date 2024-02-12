@@ -116,17 +116,45 @@ export const runScriptContent = (
   return errorMsg;
 };
 
+/**
+ * Replace some `this` symbols with a new value.
+ * Still not perfect, but might be better than a less advanced regex
+ * Check out the tests for examples: tests/unit/worker-exec.spec.ts
+ *
+ * This still fails with simple strings like:
+ * 'sadly we fail at this simple string'
+ *
+ * One way to do that would be to remove all comments from code and do single / double quote counting
+ * per symbol. But this will still fail with evals.
+ */
+export const replaceThisInSource = (scriptContent: string, newThis: string): string => {
+  /**
+   * Best for now but not perfect
+   * We don't use Regex lookbehind, because of Safari
+   */
+  const FIND_THIS = /([a-zA-Z0-9_$\.\'\"\`])?(\.\.\.)?this(?![a-zA-Z0-9_$:])/g;
+
+  return scriptContent.replace(FIND_THIS, (match, p1, p2) => {
+    const prefix = (p1 || '') + (p2 || '');
+    if (p1 != null) {
+      return prefix + 'this';
+    }
+    // If there was a preceding character, include it unchanged
+    return prefix + newThis;
+  });
+};
+
 export const run = (env: WebWorkerEnvironment, scriptContent: string, scriptUrl?: string) => {
   env.$runWindowLoadEvent$ = 1;
 
+  // First we want to replace all `this` symbols
+  let sourceWithReplacedThis = replaceThisInSource(scriptContent, '(thi$(this)?window:this)');
+
   scriptContent =
-    `with(this){${scriptContent
-      .replace(/\bthis\b/g, (match, offset, originalStr) =>
-        offset > 0 && originalStr[offset - 1] !== '$' ? '(thi$(this)?window:this)' : match
-      )
-      .replace(/\/\/# so/g, '//Xso')}\n;function thi$(t){return t===this}};${(
-      webWorkerCtx.$config$.globalFns || []
-    )
+    `with(this){${sourceWithReplacedThis.replace(
+      /\/\/# so/g,
+      '//Xso'
+    )}\n;function thi$(t){return t===this}};${(webWorkerCtx.$config$.globalFns || [])
       .filter((globalFnName) => /[a-zA-Z_$][0-9a-zA-Z_$]*/.test(globalFnName))
       .map((g) => `(typeof ${g}=='function'&&(this.${g}=${g}))`)
       .join(';')};` + (scriptUrl ? '\n//# sourceURL=' + scriptUrl : '');

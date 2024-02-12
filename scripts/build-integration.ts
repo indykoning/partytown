@@ -1,7 +1,9 @@
-import { BuildOptions, submodulePackageJson } from './utils';
-import { join } from 'path';
+import { BuildOptions, submodulePackageJson } from './utils.js';
+import { join } from 'node:path';
 import type { OutputOptions, RollupOptions } from 'rollup';
-import { readFile } from 'fs-extra';
+import fsExtra from 'fs-extra';
+
+const { readFile } = fsExtra;
 
 export function buildIntegration(opts: BuildOptions): RollupOptions {
   const output: OutputOptions[] = [
@@ -12,6 +14,11 @@ export function buildIntegration(opts: BuildOptions): RollupOptions {
     {
       file: join(opts.distIntegrationDir, 'index.mjs'),
       format: 'es',
+    },
+    {
+      file: join(opts.testsDir, 'integrations', 'load-scripts-on-main-thread', 'snippet.js'),
+      format: 'umd',
+      name: 'partytownIntegration',
     },
   ];
 

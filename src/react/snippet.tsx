@@ -20,7 +20,7 @@ export interface PartytownProps extends PartytownConfig {}
  *
  * @public
  */
-export const Partytown = (props: PartytownProps = {}): any => {
+export const Partytown = ({ nonce, ...props }: PartytownProps = {}): any => {
   // purposely not using useState() or useEffect() so this component
   // can also work as a React Server Component
 
@@ -35,6 +35,7 @@ export const Partytown = (props: PartytownProps = {}): any => {
       const scriptElm = document.createElement('script');
       scriptElm.dataset.partytown = '';
       scriptElm.innerHTML = partytownSnippet(props);
+      scriptElm.nonce = nonce;
       document.head.appendChild(scriptElm);
     }
     // should only append this script once per document, and is not dynamic
@@ -48,7 +49,13 @@ export const Partytown = (props: PartytownProps = {}): any => {
   // add the same script to the <head>.
   const innerHTML = partytownSnippet(props) + 'document.currentScript.dataset.partytown="";';
 
-  return <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: innerHTML }} />;
+  return (
+    <script
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: innerHTML }}
+      nonce={nonce}
+    />
+  );
 };
 
 interface PartytownDocument extends Document {

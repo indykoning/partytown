@@ -5,6 +5,7 @@ import {
   isValidMemberName,
   len,
   noop,
+  serializeConfig,
 } from '../utils';
 import { config, docImpl, libPath, mainWindow } from './main-globals';
 import {
@@ -61,15 +62,7 @@ export const readMainPlatform = () => {
     readImplementation('Node', textNode),
   ];
 
-  const $config$ = JSON.stringify(config, (k, v) => {
-    if (typeof v === 'function') {
-      v = String(v);
-      if (v.startsWith(k + '(')) {
-        v = 'function ' + v;
-      }
-    }
-    return v;
-  });
+  const $config$ = serializeConfig(config);
 
   const initWebWorkerData: InitWebWorkerData = {
     $config$,
@@ -100,9 +93,8 @@ export const readMainInterfaces = () => {
   return readImplementations(elms, []);
 };
 
-const cstrs = new Set(['Object']);
-
 const readImplementations = (impls: any[], interfaces: InterfaceInfo[]) => {
+  const cstrs = new Set(['Object']);
   const cstrImpls = impls
     .filter((implData) => implData[0])
     .map((implData) => {
@@ -176,7 +168,7 @@ const readImplementationMember = (
         }
       } else if (memberType === 'object' && value != null) {
         cstrName = getConstructorName(value);
-        if (cstrName !== 'Object' && (self as any)[cstrName]) {
+        if (cstrName !== 'Object' && cstrName !== 'Function' && (self as any)[cstrName]) {
           interfaceMembers.push([memberName, value.nodeType || cstrName]);
         }
       } else if (memberType !== 'symbol') {
