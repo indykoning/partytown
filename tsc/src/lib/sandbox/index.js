@@ -20,7 +20,7 @@ syncCreateMessenger(receiveMessage).then((onMessageHandler) => {
             })), { name: `Partytown 🎉` });
         worker.onmessage = (ev) => {
             const msg = ev.data;
-            if (msg[0] === 12 /* AsyncAccessRequest */) {
+            if (msg[0] === 12 /* WorkerMessageType.AsyncAccessRequest */) {
                 // fire and forget async call within web worker
                 mainAccessHandler(worker, msg[1]);
             }

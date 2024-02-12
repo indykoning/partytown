@@ -1,5 +1,5 @@
-import type { MainWindow, PartytownConfig, PartytownWebWorker, WebWorkerEnvironment, WinId } from '../../src/lib/types';
-export declare const suite: (title?: string | undefined) => import("uvu").uvu.Test<TestContext>;
+import type { MainWindow, PartytownInternalConfig, PartytownWebWorker, WebWorkerEnvironment, WinId } from '../../src/lib/types';
+export declare const suite: (title?: string) => import("uvu").uvu.Test<TestContext>;
 export interface TestContext {
     winId: WinId;
     /**
@@ -30,7 +30,7 @@ export interface TestContext {
     location: Location;
     loc: any;
     worker: TestWorker;
-    config: PartytownConfig;
+    config: PartytownInternalConfig;
     env: WebWorkerEnvironment;
     snippetCode: string;
     run: (code: string) => any;

@@ -40,7 +40,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             const instanceId = mediaElm[InstanceIdKey];
             const instance = {
                 addEventListener(...args) {
-                    callMethod(mediaElm, [audioTracks, 'addEventListener'], args, 3 /* NonBlockingNoSideEffect */);
+                    callMethod(mediaElm, [audioTracks, 'addEventListener'], args, 3 /* CallType.NonBlockingNoSideEffect */);
                 },
                 getTrackById(...args) {
                     return callMethod(mediaElm, [audioTracks, 'getTrackById'], args);
@@ -49,7 +49,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
                     return getter(mediaElm, [audioTracks, 'length']);
                 },
                 removeEventListener(...args) {
-                    callMethod(mediaElm, [audioTracks, 'removeEventListener'], args, 3 /* NonBlockingNoSideEffect */);
+                    callMethod(mediaElm, [audioTracks, 'removeEventListener'], args, 3 /* CallType.NonBlockingNoSideEffect */);
                 },
             };
             return new Proxy(instance, {
@@ -68,10 +68,10 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             this[MediaSourceKey] = mediaSource;
         }
         addEventListener(...args) {
-            callMethod(this[MediaSourceKey], ['sourceBuffers', 'addEventListener'], args, 3 /* NonBlockingNoSideEffect */);
+            callMethod(this[MediaSourceKey], ['sourceBuffers', 'addEventListener'], args, 3 /* CallType.NonBlockingNoSideEffect */);
         }
         removeEventListener(...args) {
-            callMethod(this[MediaSourceKey], ['sourceBuffers', 'removeEventListener'], args, 3 /* NonBlockingNoSideEffect */);
+            callMethod(this[MediaSourceKey], ['sourceBuffers', 'removeEventListener'], args, 3 /* CallType.NonBlockingNoSideEffect */);
         }
     });
     const WorkerSourceBuffer = defineCstr(win, 'SourceBuffer', (_b = class extends WorkerEventTargetProxy {
@@ -82,11 +82,11 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             }
             abort() {
                 const sbIndex = getSourceBufferIndex(this);
-                callMethod(this, [sbIndex, 'appendWindowStart'], EMPTY_ARRAY, 1 /* Blocking */);
+                callMethod(this, [sbIndex, 'appendWindowStart'], EMPTY_ARRAY, 1 /* CallType.Blocking */);
             }
             addEventListener(...args) {
                 const sbIndex = getSourceBufferIndex(this);
-                callMethod(this, [sbIndex, 'addEventListener'], args, 3 /* NonBlockingNoSideEffect */);
+                callMethod(this, [sbIndex, 'addEventListener'], args, 3 /* CallType.NonBlockingNoSideEffect */);
             }
             appendBuffer(buf) {
                 this[SourceBufferTasksKey].push(['appendBuffer', [buf], buf]);
@@ -120,7 +120,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             }
             changeType(mimeType) {
                 const sbIndex = getSourceBufferIndex(this);
-                callMethod(this, [sbIndex, 'changeType'], [mimeType], 2 /* NonBlocking */);
+                callMethod(this, [sbIndex, 'changeType'], [mimeType], 2 /* CallType.NonBlocking */);
             }
             get mode() {
                 const sbIndex = getSourceBufferIndex(this);
@@ -136,7 +136,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             }
             removeEventListener(...args) {
                 const sbIndex = getSourceBufferIndex(this);
-                callMethod(this, [sbIndex, 'removeEventListener'], args, 3 /* NonBlockingNoSideEffect */);
+                callMethod(this, [sbIndex, 'removeEventListener'], args, 3 /* CallType.NonBlockingNoSideEffect */);
             }
             get timestampOffset() {
                 const sbIndex = getSourceBufferIndex(this);
@@ -178,7 +178,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
                 const task = sourceBuffer[SourceBufferTasksKey].shift();
                 if (task) {
                     const sbIndex = getSourceBufferIndex(sourceBuffer);
-                    callMethod(sourceBuffer, [sbIndex, task[0]], task[1], 3 /* NonBlockingNoSideEffect */, undefined, task[2]);
+                    callMethod(sourceBuffer, [sbIndex, task[0]], task[1], 3 /* CallType.NonBlockingNoSideEffect */, undefined, task[2]);
                 }
             }
             setTimeout(() => drainSourceBufferQueue(sourceBuffer), 50);
@@ -229,7 +229,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             return sourceBuffer;
         }
         clearLiveSeekableRange() {
-            callMethod(this, ['clearLiveSeekableRange'], EMPTY_ARRAY, 2 /* NonBlocking */);
+            callMethod(this, ['clearLiveSeekableRange'], EMPTY_ARRAY, 2 /* CallType.NonBlocking */);
         }
         get duration() {
             return getter(this, ['duration']);
@@ -238,7 +238,7 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             setter(this, ['duration'], value);
         }
         endOfStream(endOfStreamError) {
-            callMethod(this, ['endOfStream'], [endOfStreamError], 3 /* NonBlockingNoSideEffect */);
+            callMethod(this, ['endOfStream'], [endOfStreamError], 3 /* CallType.NonBlockingNoSideEffect */);
         }
         get readyState() {
             return getter(this, ['readyState']);
@@ -247,11 +247,11 @@ export const initMedia = (WorkerBase, WorkerEventTargetProxy, env, win) => {
             const index = getSourceBufferIndex(sourceBuffer);
             if (index > -1) {
                 this[SourceBuffersKey].splice(index, 1);
-                callMethod(this, ['removeSourceBuffer'], [index], 1 /* Blocking */);
+                callMethod(this, ['removeSourceBuffer'], [index], 1 /* CallType.Blocking */);
             }
         }
         setLiveSeekableRange(start, end) {
-            callMethod(this, ['setLiveSeekableRange'], [start, end], 2 /* NonBlocking */);
+            callMethod(this, ['setLiveSeekableRange'], [start, end], 2 /* CallType.NonBlocking */);
         }
         get sourceBuffers() {
             return this[SourceBuffersKey];

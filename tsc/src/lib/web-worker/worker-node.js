@@ -2,7 +2,7 @@ import { cachedTreeProps } from './worker-constructors';
 import { callMethod, setter, sendToMain } from './worker-proxy';
 import '../types';
 import { commaSplit, InstanceDataKey, InstanceIdKey, webWorkerCtx, WinIdKey, } from './worker-constants';
-import { defineConstructorName, SCRIPT_TYPE, SCRIPT_TYPE_EXEC } from '../utils';
+import { defineConstructorName, SCRIPT_TYPE, SCRIPT_TYPE_EXEC, testIfMustLoadScriptOnMainThread, } from '../utils';
 import { getInstanceStateValue } from './worker-state';
 import { insertIframe, runScriptContent } from './worker-exec';
 import { isScriptJsType } from './worker-script';
@@ -19,22 +19,21 @@ export const createNodeCstr = (win, env, WorkerBase) => {
         }
         set href(_) { }
         insertBefore(newNode, referenceNode) {
-            var _a, _b;
             // ensure the node being added to the window's document
             // is given the same winId as the window it's being added to
             const winId = (newNode[WinIdKey] = this[WinIdKey]);
             const instanceId = newNode[InstanceIdKey];
             const nodeName = newNode[InstanceDataKey];
-            const isScript = nodeName === "SCRIPT" /* Script */;
-            const isIFrame = nodeName === "IFRAME" /* IFrame */;
+            const isScript = nodeName === "SCRIPT" /* NodeName.Script */;
+            const isIFrame = nodeName === "IFRAME" /* NodeName.IFrame */;
             if (isScript) {
-                const scriptContent = getInstanceStateValue(newNode, 3 /* innerHTML */);
-                const scriptType = getInstanceStateValue(newNode, 5 /* type */);
+                const scriptContent = getInstanceStateValue(newNode, 3 /* StateProp.innerHTML */);
+                const scriptType = getInstanceStateValue(newNode, 5 /* StateProp.type */);
                 if (scriptContent) {
                     if (isScriptJsType(scriptType)) {
                         // @ts-ignore
                         const scriptId = newNode.id;
-                        const loadOnMainThread = scriptId && ((_b = (_a = config.loadScriptsOnMainThread) === null || _a === void 0 ? void 0 : _a.includes) === null || _b === void 0 ? void 0 : _b.call(_a, scriptId));
+                        const loadOnMainThread = scriptId && testIfMustLoadScriptOnMainThread(config, scriptId);
                         if (loadOnMainThread) {
                             setter(newNode, ['type'], 'text/javascript');
                         }
@@ -49,11 +48,11 @@ export const createNodeCstr = (win, env, WorkerBase) => {
                     setter(newNode, ['innerHTML'], scriptContent);
                 }
             }
-            callMethod(this, ['insertBefore'], [newNode, referenceNode], 2 /* NonBlocking */);
+            callMethod(this, ['insertBefore'], [newNode, referenceNode], 2 /* CallType.NonBlocking */);
             if (isIFrame) {
                 // an iframe element's instanceId is also
                 // the winId of its contentWindow
-                const src = getInstanceStateValue(newNode, 0 /* src */);
+                const src = getInstanceStateValue(newNode, 0 /* StateProp.src */);
                 if (src && src.startsWith('javascript:')) {
                     const scriptContent = src.split('javascript:')[1];
                     runScriptContent(env, instanceId, scriptContent, winId, '');
@@ -62,7 +61,7 @@ export const createNodeCstr = (win, env, WorkerBase) => {
             }
             if (isScript) {
                 sendToMain(true);
-                webWorkerCtx.$postMessage$([7 /* InitializeNextScript */, winId]);
+                webWorkerCtx.$postMessage$([7 /* WorkerMessageType.InitializeNextScript */, winId]);
             }
             return newNode;
         }

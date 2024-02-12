@@ -38,6 +38,14 @@ export const createImageConstructor = (env) => class HTMLImageElement {
             this.e.push(cb);
         }
     }
+    removeEventListener(eventName, cb) {
+        if (eventName === 'load') {
+            this.l = this.l.filter((fn) => fn !== cb);
+        }
+        if (eventName === 'error') {
+            this.e = this.e.filter((fn) => fn !== cb);
+        }
+    }
     get onload() {
         return this.l[0];
     }

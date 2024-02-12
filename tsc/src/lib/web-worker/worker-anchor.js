@@ -9,11 +9,17 @@ export const patchHTMLAnchorElement = (WorkerHTMLAnchorElement, env) => {
     commaSplit('hash,host,hostname,href,origin,pathname,port,protocol,search').map((anchorProp) => {
         HTMLAnchorDescriptorMap[anchorProp] = {
             get() {
-                let value = getInstanceStateValue(this, 4 /* url */);
+                let value = getInstanceStateValue(this, 4 /* StateProp.url */);
                 let href;
                 if (typeof value !== 'string') {
                     href = getter(this, ['href']);
-                    setInstanceStateValue(this, 4 /* url */, href);
+                    if (href === '') {
+                        if (anchorProp === 'protocol') {
+                            return ':';
+                        }
+                        return '';
+                    }
+                    setInstanceStateValue(this, 4 /* StateProp.url */, href);
                     value = new URL(href)[anchorProp];
                 }
                 return resolveToUrl(env, value, null)[anchorProp];
@@ -34,7 +40,7 @@ export const patchHTMLAnchorElement = (WorkerHTMLAnchorElement, env) => {
                     url = resolveToUrl(env, this.href, null);
                     url[anchorProp] = value;
                 }
-                setInstanceStateValue(this, 4 /* url */, url.href);
+                setInstanceStateValue(this, 4 /* StateProp.url */, url.href);
                 setter(this, ['href'], url.href);
             },
         };

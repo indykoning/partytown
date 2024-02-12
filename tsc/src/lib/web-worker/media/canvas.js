@@ -15,12 +15,12 @@ export const initCanvas = (WorkerBase, win) => {
     };
     const WorkerCanvasGradient = defineCstr(win, 'CanvasGradient', class extends WorkerBase {
         addColorStop(...args) {
-            callMethod(this, ['addColorStop'], args, 2 /* NonBlocking */);
+            callMethod(this, ['addColorStop'], args, 2 /* CallType.NonBlocking */);
         }
     });
     const WorkerCanvasPattern = defineCstr(win, 'CanvasPattern', class extends WorkerBase {
         setTransform(...args) {
-            callMethod(this, ['setTransform'], args, 2 /* NonBlocking */);
+            callMethod(this, ['setTransform'], args, 2 /* CallType.NonBlocking */);
         }
     });
     const createContext2D = (canvasInstance, contextType, contextAttributes) => {
@@ -28,7 +28,7 @@ export const initCanvas = (WorkerBase, win) => {
         const winId = canvasInstance[WinIdKey];
         const ctxInstanceId = randomId();
         const ctxInstance = { [WinIdKey]: winId, [InstanceIdKey]: ctxInstanceId, [ApplyPathKey]: [] };
-        const ctx = callMethod(canvasInstance, ['getContext'], [contextType, contextAttributes], 1 /* Blocking */, ctxInstanceId);
+        const ctx = callMethod(canvasInstance, ['getContext'], [contextType, contextAttributes], 1 /* CallType.Blocking */, ctxInstanceId);
         const ctx2dGetterMethods = 'getContextAttributes,getImageData,getLineDash,getTransform,isPointInPath,isPointInStroke,measureText'.split(',');
         const CanvasRenderingContext2D = {
             get(target, propName) {
@@ -40,7 +40,7 @@ export const initCanvas = (WorkerBase, win) => {
                                 // createConicGradient,createImageData,createLinearGradient,createPattern,createRadialGradient
                                 // getter method, remember the instance
                                 const instanceId = randomId();
-                                callMethod(ctxInstance, [propName], args, 2 /* NonBlocking */, instanceId);
+                                callMethod(ctxInstance, [propName], args, 2 /* CallType.NonBlocking */, instanceId);
                                 if (propName === 'createImageData' || propName === 'createPattern') {
                                     notImpl(`${propName}()`);
                                     return { setTransform: () => { } };
@@ -50,8 +50,8 @@ export const initCanvas = (WorkerBase, win) => {
                             }
                             // context method
                             const methodCallType = ctx2dGetterMethods.includes(propName)
-                                ? 1 /* Blocking */
-                                : 2 /* NonBlocking */;
+                                ? 1 /* CallType.Blocking */
+                                : 2 /* CallType.NonBlocking */;
                             return callMethod(ctxInstance, [propName], args, methodCallType);
                         };
                     }
@@ -82,7 +82,7 @@ export const initCanvas = (WorkerBase, win) => {
         const winId = canvasInstance[WinIdKey];
         const ctxInstanceId = randomId();
         const ctxInstance = { [WinIdKey]: winId, [InstanceIdKey]: ctxInstanceId, [ApplyPathKey]: [] };
-        const ctx = callMethod(canvasInstance, ['getContext'], [contextType, contextAttributes], 1 /* Blocking */, ctxInstanceId);
+        const ctx = callMethod(canvasInstance, ['getContext'], [contextType, contextAttributes], 1 /* CallType.Blocking */, ctxInstanceId);
         const WebGLRenderingContextHandler = {
             get(target, propName) {
                 if (typeof propName === 'string') {
@@ -119,8 +119,8 @@ export const initCanvas = (WorkerBase, win) => {
         methodName.startsWith('get') ||
         methodName.startsWith('is') ||
         ctxWebGLGetterMethods.includes(methodName)
-        ? 1 /* Blocking */
-        : 2 /* NonBlocking */;
+        ? 1 /* CallType.Blocking */
+        : 2 /* CallType.NonBlocking */;
     defineCstr(win, 'CanvasGradient', WorkerCanvasGradient);
     defineCstr(win, 'CanvasPattern', WorkerCanvasPattern);
     definePrototypePropertyDescriptor(win.HTMLCanvasElement, HTMLCanvasDescriptorMap);

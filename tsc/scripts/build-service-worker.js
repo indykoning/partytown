@@ -1,9 +1,10 @@
 import { rollup } from 'rollup';
-import { fileSize, jsBannerPlugin, onwarn, syncCommunicationModulesPlugin, versionPlugin, watchDir, } from './utils';
-import { join } from 'path';
-import { minifyPlugin } from './minify';
-import { writeFile } from 'fs-extra';
-import { webWorkerBlobUrlPlugin } from './build-web-worker';
+import { fileSize, jsBannerPlugin, onwarn, syncCommunicationModulesPlugin, versionPlugin, watchDir, } from './utils.js';
+import { join } from 'node:path';
+import { minifyPlugin } from './minify.js';
+import fsExtra from 'fs-extra';
+import { webWorkerBlobUrlPlugin } from './build-web-worker.js';
+const { writeFile } = fsExtra;
 export function buildServiceWorker(opts) {
     const swDebug = {
         file: join(opts.distLibDebugDir, 'partytown-sw.js'),

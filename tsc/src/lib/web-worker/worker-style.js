@@ -31,7 +31,7 @@ export const createCSSStyleSheetConstructor = (win, cssStyleSheetCstrName) => {
             const cssRules = getCssRules(this.ownerNode);
             index = index === undefined ? 0 : index;
             if (index >= 0 && index <= cssRules.length) {
-                callMethod(this.ownerNode, ['sheet', 'insertRule'], [ruleText, index], 2 /* NonBlocking */);
+                callMethod(this.ownerNode, ['sheet', 'insertRule'], [ruleText, index], 2 /* CallType.NonBlocking */);
                 // insert bogus data so the array/length is correct
                 // but later on, if we ever want to "read" this inserted rule
                 // we do a real lookup to get the dom correct data
@@ -42,7 +42,7 @@ export const createCSSStyleSheetConstructor = (win, cssStyleSheetCstrName) => {
             return index;
         }
         deleteRule(index) {
-            callMethod(this.ownerNode, ['sheet', 'deleteRule'], [index], 2 /* NonBlocking */);
+            callMethod(this.ownerNode, ['sheet', 'deleteRule'], [index], 2 /* CallType.NonBlocking */);
             getCssRules(this.ownerNode).splice(index, 1);
             logDimensionCacheClearMethod(this.ownerNode, 'deleteRule');
             cachedDimensions.clear();
@@ -61,10 +61,10 @@ export const createCSSStyleSheetConstructor = (win, cssStyleSheetCstrName) => {
     definePrototypePropertyDescriptor(win.HTMLStyleElement, HTMLStyleDescriptorMap);
 };
 const getCssRules = (ownerNode, cssRules) => {
-    cssRules = getInstanceStateValue(ownerNode, 2 /* cssRules */);
+    cssRules = getInstanceStateValue(ownerNode, 2 /* StateProp.cssRules */);
     if (!cssRules) {
         cssRules = getter(ownerNode, ['sheet', 'cssRules']);
-        setInstanceStateValue(ownerNode, 2 /* cssRules */, cssRules);
+        setInstanceStateValue(ownerNode, 2 /* StateProp.cssRules */, cssRules);
     }
     return cssRules;
 };

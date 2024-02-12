@@ -5,6 +5,6 @@ import type { PartytownConfig } from '../lib/types';
  *
  * @public
  */
-export declare const partytownSnippet: (config?: PartytownConfig | undefined) => string;
+export declare const partytownSnippet: (config?: PartytownConfig) => string;
 export { SCRIPT_TYPE } from '../lib/utils';
-export type { PartytownConfig, PartytownForwardProperty, ApplyHook, GetHook, SetHook, ResolveUrlType, } from '../lib/types';
+export type { PartytownConfig, PartytownForwardProperty, PartytownForwardPropertyWithSettings, PartytownForwardPropertySettings, ApplyHook, GetHook, SetHook, ResolveUrlType, } from '../lib/types';

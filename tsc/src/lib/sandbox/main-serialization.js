@@ -5,18 +5,18 @@ import '../types';
 export const serializeForWorker = ($winId$, value, added, type, cstrName, prevInstanceId) => {
     if (value !== undefined && (type = typeof value)) {
         if (type === 'string' || type === 'number' || type === 'boolean' || value == null) {
-            return [0 /* Primitive */, value];
+            return [0 /* SerializedType.Primitive */, value];
         }
         else if (type === 'function') {
-            return [6 /* Function */];
+            return [6 /* SerializedType.Function */];
         }
         else if ((added = added || new Set()) && Array.isArray(value)) {
             if (added.has(value)) {
-                return [1 /* Array */, []];
+                return [1 /* SerializedType.Array */, []];
             }
             else {
                 return (added.add(value) && [
-                    1 /* Array */,
+                    1 /* SerializedType.Array */,
                     value.map((v) => serializeForWorker($winId$, v, added)),
                 ]);
             }
@@ -24,7 +24,7 @@ export const serializeForWorker = ($winId$, value, added, type, cstrName, prevIn
         else if (type === 'object') {
             if (serializedValueIsError(value)) {
                 return [
-                    14 /* Error */,
+                    14 /* SerializedType.Error */,
                     {
                         name: value.name,
                         message: value.message,
@@ -34,43 +34,43 @@ export const serializeForWorker = ($winId$, value, added, type, cstrName, prevIn
             }
             else if ((cstrName = getConstructorName(value)) === '') {
                 // error reading this object, probably "DOMException: Blocked from accessing a cross-origin frame."
-                return [2 /* Object */, {}];
+                return [2 /* SerializedType.Object */, {}];
             }
             else if (cstrName === 'Window') {
-                return [3 /* Instance */, [$winId$, $winId$]];
+                return [3 /* SerializedType.Instance */, [$winId$, $winId$]];
             }
             else if (cstrName === 'HTMLCollection' || cstrName === 'NodeList') {
                 return [
-                    7 /* NodeList */,
+                    7 /* SerializedType.NodeList */,
                     Array.from(value).map((v) => serializeForWorker($winId$, v, added)[1]),
                 ];
             }
             else if (cstrName.endsWith('Event')) {
-                return [5 /* Event */, serializeObjectForWorker($winId$, value, added)];
+                return [5 /* SerializedType.Event */, serializeObjectForWorker($winId$, value, added)];
             }
             else if (cstrName === 'CSSRuleList') {
-                return [12 /* CSSRuleList */, Array.from(value).map(serializeCssRuleForWorker)];
+                return [12 /* SerializedType.CSSRuleList */, Array.from(value).map(serializeCssRuleForWorker)];
             }
             else if (startsWith(cstrName, 'CSS') && cstrName.endsWith('Rule')) {
-                return [11 /* CSSRule */, serializeCssRuleForWorker(value)];
+                return [11 /* SerializedType.CSSRule */, serializeCssRuleForWorker(value)];
             }
             else if (cstrName === 'CSSStyleDeclaration') {
                 return [
-                    13 /* CSSStyleDeclaration */,
+                    13 /* SerializedType.CSSStyleDeclaration */,
                     serializeObjectForWorker($winId$, value, added),
                 ];
             }
             else if (cstrName === 'Attr') {
-                return [10 /* Attr */, [value.name, value.value]];
+                return [10 /* SerializedType.Attr */, [value.name, value.value]];
             }
             else if (value.nodeType) {
                 return [
-                    3 /* Instance */,
+                    3 /* SerializedType.Instance */,
                     [$winId$, getAndSetInstanceId(value), getNodeName(value), prevInstanceId],
                 ];
             }
             else {
-                return [2 /* Object */, serializeObjectForWorker($winId$, value, added, true, true)];
+                return [2 /* SerializedType.Object */, serializeObjectForWorker($winId$, value, added, true, true)];
             }
         }
         else {
@@ -120,28 +120,28 @@ export const deserializeFromWorker = (worker, serializedTransfer, serializedType
     if (serializedTransfer) {
         serializedType = serializedTransfer[0];
         serializedValue = serializedTransfer[1];
-        if (serializedType === 0 /* Primitive */) {
+        if (serializedType === 0 /* SerializedType.Primitive */) {
             return serializedValue;
         }
-        else if (serializedType === 4 /* Ref */) {
+        else if (serializedType === 4 /* SerializedType.Ref */) {
             return deserializeRefFromWorker(worker, serializedValue);
         }
-        else if (serializedType === 1 /* Array */) {
+        else if (serializedType === 1 /* SerializedType.Array */) {
             return serializedValue.map((v) => deserializeFromWorker(worker, v));
         }
-        else if (serializedType === 3 /* Instance */) {
+        else if (serializedType === 3 /* SerializedType.Instance */) {
             return getInstance(serializedValue[0], serializedValue[1]);
         }
-        else if (serializedType === 5 /* Event */) {
+        else if (serializedType === 5 /* SerializedType.Event */) {
             return constructEvent(deserializeObjectFromWorker(worker, serializedValue));
         }
-        else if (serializedType === 2 /* Object */) {
+        else if (serializedType === 2 /* SerializedType.Object */) {
             return deserializeObjectFromWorker(worker, serializedValue);
         }
-        else if (serializedType === 8 /* ArrayBuffer */) {
+        else if (serializedType === 8 /* SerializedType.ArrayBuffer */) {
             return serializedValue;
         }
-        else if (serializedType === 9 /* ArrayBufferView */) {
+        else if (serializedType === 9 /* SerializedType.ArrayBufferView */) {
             return new window[serializedTransfer[2]](serializedValue);
         }
         else {
@@ -158,7 +158,7 @@ const deserializeRefFromWorker = (worker, { $winId$, $instanceId$, $refId$ }, re
     if (!ref) {
         ref = function (...args) {
             worker.postMessage([
-                9 /* RefHandlerCallback */,
+                9 /* WorkerMessageType.RefHandlerCallback */,
                 {
                     $winId$,
                     $instanceId$,

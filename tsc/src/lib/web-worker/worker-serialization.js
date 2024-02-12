@@ -7,11 +7,11 @@ import { setWorkerRef } from './worker-state';
 export const serializeForMain = ($winId$, $instanceId$, value, added, type) => {
     if (value !== undefined && (type = typeof value)) {
         if (type === 'string' || type === 'boolean' || type === 'number' || value == null) {
-            return [0 /* Primitive */, value];
+            return [0 /* SerializedType.Primitive */, value];
         }
         else if (type === 'function') {
             return [
-                4 /* Ref */,
+                4 /* SerializedType.Ref */,
                 {
                     $winId$,
                     $instanceId$,
@@ -21,38 +21,38 @@ export const serializeForMain = ($winId$, $instanceId$, value, added, type) => {
         }
         else if ((added = added || new Set()) && Array.isArray(value)) {
             if (added.has(value)) {
-                return [1 /* Array */, []];
+                return [1 /* SerializedType.Array */, []];
             }
             else {
                 return (added.add(value) && [
-                    1 /* Array */,
+                    1 /* SerializedType.Array */,
                     value.map((v) => serializeForMain($winId$, $instanceId$, v, added)),
                 ]);
             }
         }
         else if (type === 'object') {
             if (value[InstanceIdKey]) {
-                return [3 /* Instance */, [value[WinIdKey], value[InstanceIdKey]]];
+                return [3 /* SerializedType.Instance */, [value[WinIdKey], value[InstanceIdKey]]];
             }
             else if (value instanceof Event) {
                 return [
-                    5 /* Event */,
+                    5 /* SerializedType.Event */,
                     serializeObjectForMain($winId$, $instanceId$, value, false, added),
                 ];
             }
             else if (supportsTrustedHTML && value instanceof TrustedHTML) {
                 // https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API
-                return [0 /* Primitive */, value.toString()];
+                return [0 /* SerializedType.Primitive */, value.toString()];
             }
             else if (value instanceof ArrayBuffer) {
-                return [8 /* ArrayBuffer */, value];
+                return [8 /* SerializedType.ArrayBuffer */, value];
             }
             else if (ArrayBuffer.isView(value)) {
-                return [9 /* ArrayBufferView */, value.buffer, getConstructorName(value)];
+                return [9 /* SerializedType.ArrayBufferView */, value.buffer, getConstructorName(value)];
             }
             else {
                 return [
-                    2 /* Object */,
+                    2 /* SerializedType.Object */,
                     serializeObjectForMain($winId$, $instanceId$, value, true, added),
                 ];
             }
@@ -81,48 +81,48 @@ const serializeObjectForMain = (winId, instanceId, obj, includeFunctions, added,
 };
 export const serializeInstanceForMain = (instance, value) => instance
     ? serializeForMain(instance[WinIdKey], instance[InstanceIdKey], value)
-    : [0 /* Primitive */, value];
+    : [0 /* SerializedType.Primitive */, value];
 export const deserializeFromMain = (winId, instanceId, applyPath, serializedValueTransfer, serializedType, serializedValue, obj, key) => {
     if (serializedValueTransfer) {
         serializedType = serializedValueTransfer[0];
         serializedValue = serializedValueTransfer[1];
-        if (serializedType === 0 /* Primitive */ ||
-            serializedType === 11 /* CSSRule */ ||
-            serializedType === 12 /* CSSRuleList */) {
+        if (serializedType === 0 /* SerializedType.Primitive */ ||
+            serializedType === 11 /* SerializedType.CSSRule */ ||
+            serializedType === 12 /* SerializedType.CSSRuleList */) {
             return serializedValue;
         }
-        if (serializedType === 4 /* Ref */) {
+        if (serializedType === 4 /* SerializedType.Ref */) {
             return deserializeRefFromMain(applyPath, serializedValue);
         }
-        if (serializedType === 6 /* Function */) {
+        if (serializedType === 6 /* SerializedType.Function */) {
             if (winId && applyPath.length > 0) {
-                return (...args) => callMethod(environments[winId].$window$, applyPath, args, 1 /* Blocking */);
+                return (...args) => callMethod(environments[winId].$window$, applyPath, args, 1 /* CallType.Blocking */);
             }
             return noop;
         }
-        if (serializedType === 3 /* Instance */) {
+        if (serializedType === 3 /* SerializedType.Instance */) {
             return getOrCreateSerializedInstance(serializedValue);
         }
-        if (serializedType === 7 /* NodeList */) {
+        if (serializedType === 7 /* SerializedType.NodeList */) {
             return new NodeList(serializedValue.map(getOrCreateSerializedInstance));
         }
-        if (serializedType === 10 /* Attr */) {
+        if (serializedType === 10 /* SerializedType.Attr */) {
             return new Attr(serializedValue);
         }
-        if (serializedType === 1 /* Array */) {
+        if (serializedType === 1 /* SerializedType.Array */) {
             return serializedValue.map((v) => deserializeFromMain(winId, instanceId, applyPath, v));
         }
-        if (serializedType === 14 /* Error */) {
+        if (serializedType === 14 /* SerializedType.Error */) {
             return new CustomError(serializedValue);
         }
         obj = {};
         for (key in serializedValue) {
             obj[key] = deserializeFromMain(winId, instanceId, [...applyPath, key], serializedValue[key]);
         }
-        if (serializedType === 13 /* CSSStyleDeclaration */) {
+        if (serializedType === 13 /* SerializedType.CSSStyleDeclaration */) {
             return new environments[winId].$window$.CSSStyleDeclaration(winId, instanceId, applyPath, obj);
         }
-        if (serializedType === 5 /* Event */) {
+        if (serializedType === 5 /* SerializedType.Event */) {
             if (obj.type === 'message' && obj.origin) {
                 let postMessageKey = JSON.stringify(obj.data);
                 let postMessageData = postMessages.find((pm) => pm.$data$ === postMessageKey);
@@ -149,12 +149,12 @@ export const deserializeFromMain = (winId, instanceId, applyPath, serializedValu
                 },
             });
         }
-        if (serializedType === 2 /* Object */) {
+        if (serializedType === 2 /* SerializedType.Object */) {
             return obj;
         }
     }
 };
-export const getOrCreateSerializedInstance = ([winId, instanceId, nodeName, prevInstanceId]) => {
+export const getOrCreateSerializedInstance = ([winId, instanceId, nodeName, prevInstanceId,]) => {
     if (instanceId === winId && environments[winId]) {
         return environments[winId].$window$;
     }

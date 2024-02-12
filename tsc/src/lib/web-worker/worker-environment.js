@@ -13,6 +13,6 @@ export const createEnvironment = ({ $winId$, $parentWinId$, $url$, $visibilitySt
             logWorker(`Created ${winType} window ${normalizedWinId($winId$)} environment`, $winId$);
         }
     }
-    webWorkerCtx.$postMessage$([7 /* InitializeNextScript */, $winId$]);
+    webWorkerCtx.$postMessage$([7 /* WorkerMessageType.InitializeNextScript */, $winId$]);
     return environments[$winId$];
 };

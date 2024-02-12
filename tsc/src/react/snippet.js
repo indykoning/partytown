@@ -9,7 +9,7 @@ import { partytownSnippet } from '@builder.io/partytown/integration';
  *
  * @public
  */
-export const Partytown = (props = {}) => {
+export const Partytown = ({ nonce, ...props } = {}) => {
     // purposely not using useState() or useEffect() so this component
     // can also work as a React Server Component
     // this check is only be done on the client, and skipped over on the server
@@ -23,6 +23,7 @@ export const Partytown = (props = {}) => {
             const scriptElm = document.createElement('script');
             scriptElm.dataset.partytown = '';
             scriptElm.innerHTML = partytownSnippet(props);
+            scriptElm.nonce = nonce;
             document.head.appendChild(scriptElm);
         }
         // should only append this script once per document, and is not dynamic
@@ -34,5 +35,5 @@ export const Partytown = (props = {}) => {
     // and add the attribute which will tell the Client JS of the component to NOT
     // add the same script to the <head>.
     const innerHTML = partytownSnippet(props) + 'document.currentScript.dataset.partytown="";';
-    return React.createElement("script", { suppressHydrationWarning: true, dangerouslySetInnerHTML: { __html: innerHTML } });
+    return (React.createElement("script", { suppressHydrationWarning: true, dangerouslySetInnerHTML: { __html: innerHTML }, nonce: nonce }));
 };

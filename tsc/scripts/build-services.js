@@ -1,5 +1,5 @@
-import { submodulePackageJson } from './utils';
-import { join } from 'path';
+import { submodulePackageJson } from './utils.js';
+import { join } from 'node:path';
 export function buildServices(opts) {
     const output = [
         {

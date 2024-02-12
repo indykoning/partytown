@@ -59,10 +59,10 @@ test('run window.arr.push() call after initialized', ({ winId, win, worker, docu
     mainForwardTrigger(worker, winId, win);
     win.arr.push('a', 'b');
     const msg = worker.$messages[0][0];
-    assert.equal(msg[0], 10 /* ForwardMainTrigger */);
+    assert.equal(msg[0], 10 /* WorkerMessageType.ForwardMainTrigger */);
     assert.equal(msg[1].$winId$, winId);
     assert.equal(msg[1].$forward$, ['arr', 'push']);
-    assert.equal(msg[1].$args$[0], 1 /* Array */);
+    assert.equal(msg[1].$args$[0], 1 /* SerializedType.Array */);
 });
 test('run queued window.arr.push() call', ({ winId, win, worker, document, navigator, top }) => {
     win.partytown = {
@@ -73,10 +73,10 @@ test('run queued window.arr.push() call', ({ winId, win, worker, document, navig
     mainForwardTrigger(worker, winId, win);
     assert.equal(worker.$messages.length, 1);
     const msg = worker.$messages[0][0];
-    assert.equal(msg[0], 10 /* ForwardMainTrigger */);
+    assert.equal(msg[0], 10 /* WorkerMessageType.ForwardMainTrigger */);
     assert.equal(msg[1].$winId$, winId);
     assert.equal(msg[1].$forward$, ['arr', 'push']);
-    assert.equal(msg[1].$args$[0], 1 /* Array */);
+    assert.equal(msg[1].$args$[0], 1 /* SerializedType.Array */);
 });
 test('run queued window.fn() call', ({ winId, win, worker, document, navigator, top }) => {
     win.partytown = {
@@ -87,10 +87,10 @@ test('run queued window.fn() call', ({ winId, win, worker, document, navigator, 
     mainForwardTrigger(worker, winId, win);
     assert.equal(worker.$messages.length, 1);
     const msg = worker.$messages[0][0];
-    assert.equal(msg[0], 10 /* ForwardMainTrigger */);
+    assert.equal(msg[0], 10 /* WorkerMessageType.ForwardMainTrigger */);
     assert.equal(msg[1].$winId$, winId);
     assert.equal(msg[1].$forward$, ['fn']);
-    assert.equal(msg[1].$args$[0], 1 /* Array */);
+    assert.equal(msg[1].$args$[0], 1 /* SerializedType.Array */);
 });
 test('patch window.obj.arr.push(), queue calls', ({ win, document, navigator }) => {
     win.partytown = {

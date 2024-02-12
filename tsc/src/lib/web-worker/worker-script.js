@@ -1,4 +1,4 @@
-import { definePrototypePropertyDescriptor } from '../utils';
+import { definePrototypePropertyDescriptor, testIfMustLoadScriptOnMainThread } from '../utils';
 import { getInstanceStateValue, setInstanceStateValue } from './worker-state';
 import { getter, setter } from './worker-proxy';
 import { HTMLSrcElementDescriptorMap } from './worker-src-element';
@@ -11,19 +11,19 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement, env) => {
         innerText: innerHTMLDescriptor,
         src: {
             get() {
-                return getInstanceStateValue(this, 4 /* url */) || '';
+                return getInstanceStateValue(this, 4 /* StateProp.url */) || '';
             },
             set(url) {
                 const orgUrl = resolveUrl(env, url, null);
                 const config = webWorkerCtx.$config$;
                 url = resolveUrl(env, url, 'script');
-                setInstanceStateValue(this, 4 /* url */, url);
+                setInstanceStateValue(this, 4 /* StateProp.url */, url);
                 setter(this, ['src'], url);
                 if (orgUrl !== url) {
                     setter(this, ['dataset', 'ptsrc'], orgUrl);
                 }
-                if (this.type && config.loadScriptsOnMainThread) {
-                    const shouldExecuteScriptViaMainThread = config.loadScriptsOnMainThread.some((scriptUrl) => scriptUrl === url);
+                if (this.type) {
+                    const shouldExecuteScriptViaMainThread = testIfMustLoadScriptOnMainThread(config, url);
                     if (shouldExecuteScriptViaMainThread) {
                         setter(this, ['type'], 'text/javascript');
                     }
@@ -37,7 +37,7 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement, env) => {
             },
             set(type) {
                 if (!isScriptJsType(type)) {
-                    setInstanceStateValue(this, 5 /* type */, type);
+                    setInstanceStateValue(this, 5 /* StateProp.type */, type);
                     setter(this, ['type'], type);
                 }
             },
@@ -50,14 +50,14 @@ const innerHTMLDescriptor = {
     get() {
         const type = getter(this, ['type']);
         if (isScriptJsType(type)) {
-            return getInstanceStateValue(this, 3 /* innerHTML */) || '';
+            return getInstanceStateValue(this, 3 /* StateProp.innerHTML */) || '';
         }
         else {
             return getter(this, ['innerHTML']);
         }
     },
     set(scriptContent) {
-        setInstanceStateValue(this, 3 /* innerHTML */, scriptContent);
+        setInstanceStateValue(this, 3 /* StateProp.innerHTML */, scriptContent);
     },
 };
 export const isScriptJsType = (scriptType) => !scriptType || scriptType === 'text/javascript';

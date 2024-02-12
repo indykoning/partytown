@@ -8,7 +8,7 @@ import { getInstanceStateValue, setInstanceStateValue } from './worker-state';
 export const initNextScriptsInWebWorker = async (initScript) => {
     let winId = initScript.$winId$;
     let instanceId = initScript.$instanceId$;
-    let instance = getOrCreateNodeInstance(winId, instanceId, "SCRIPT" /* Script */);
+    let instance = getOrCreateNodeInstance(winId, instanceId, "SCRIPT" /* NodeName.Script */);
     let scriptContent = initScript.$content$;
     let scriptSrc = initScript.$url$;
     let scriptOrgSrc = initScript.$orgUrl$;
@@ -28,7 +28,7 @@ export const initNextScriptsInWebWorker = async (initScript) => {
     if (scriptSrc) {
         try {
             scriptSrc = resolveToUrl(env, scriptSrc, 'script') + '';
-            setInstanceStateValue(instance, 4 /* url */, scriptSrc);
+            setInstanceStateValue(instance, 4 /* StateProp.url */, scriptSrc);
             if (debug && webWorkerCtx.$config$.logScriptExecution) {
                 logWorker(`Execute script src: ${scriptOrgSrc}`, winId);
             }
@@ -41,17 +41,17 @@ export const initNextScriptsInWebWorker = async (initScript) => {
                     env.$currentScriptId$ = instanceId;
                     run(env, scriptContent, scriptOrgSrc || scriptSrc);
                 }
-                runStateLoadHandlers(instance, "load" /* loadHandlers */);
+                runStateLoadHandlers(instance, "load" /* StateProp.loadHandlers */);
             }
             else {
                 errorMsg = rsp.statusText;
-                runStateLoadHandlers(instance, "error" /* errorHandlers */);
+                runStateLoadHandlers(instance, "error" /* StateProp.errorHandlers */);
             }
         }
         catch (urlError) {
             console.error(urlError);
             errorMsg = String(urlError.stack || urlError);
-            runStateLoadHandlers(instance, "error" /* errorHandlers */);
+            runStateLoadHandlers(instance, "error" /* StateProp.errorHandlers */);
         }
     }
     else if (scriptContent) {
@@ -59,7 +59,7 @@ export const initNextScriptsInWebWorker = async (initScript) => {
     }
     env.$currentScriptId$ = '';
     webWorkerCtx.$postMessage$([
-        6 /* InitializedEnvironmentScript */,
+        6 /* WorkerMessageType.InitializedEnvironmentScript */,
         winId,
         instanceId,
         errorMsg,
@@ -86,12 +86,38 @@ export const runScriptContent = (env, instanceId, scriptContent, winId, errorMsg
     env.$currentScriptId$ = '';
     return errorMsg;
 };
+/**
+ * Replace some `this` symbols with a new value.
+ * Still not perfect, but might be better than a less advanced regex
+ * Check out the tests for examples: tests/unit/worker-exec.spec.ts
+ *
+ * This still fails with simple strings like:
+ * 'sadly we fail at this simple string'
+ *
+ * One way to do that would be to remove all comments from code and do single / double quote counting
+ * per symbol. But this will still fail with evals.
+ */
+export const replaceThisInSource = (scriptContent, newThis) => {
+    /**
+     * Best for now but not perfect
+     * We don't use Regex lookbehind, because of Safari
+     */
+    const FIND_THIS = /([a-zA-Z0-9_$\.\'\"\`])?(\.\.\.)?this(?![a-zA-Z0-9_$:])/g;
+    return scriptContent.replace(FIND_THIS, (match, p1, p2) => {
+        const prefix = (p1 || '') + (p2 || '');
+        if (p1 != null) {
+            return prefix + 'this';
+        }
+        // If there was a preceding character, include it unchanged
+        return prefix + newThis;
+    });
+};
 export const run = (env, scriptContent, scriptUrl) => {
     env.$runWindowLoadEvent$ = 1;
+    // First we want to replace all `this` symbols
+    let sourceWithReplacedThis = replaceThisInSource(scriptContent, '(thi$(this)?window:this)');
     scriptContent =
-        `with(this){${scriptContent
-            .replace(/\bthis\b/g, (match, offset, originalStr) => offset > 0 && originalStr[offset - 1] !== '$' ? '(thi$(this)?window:this)' : match)
-            .replace(/\/\/# so/g, '//Xso')}\n;function thi$(t){return t===this}};${(webWorkerCtx.$config$.globalFns || [])
+        `with(this){${sourceWithReplacedThis.replace(/\/\/# so/g, '//Xso')}\n;function thi$(t){return t===this}};${(webWorkerCtx.$config$.globalFns || [])
             .filter((globalFnName) => /[a-zA-Z_$][0-9a-zA-Z_$]*/.test(globalFnName))
             .map((g) => `(typeof ${g}=='function'&&(this.${g}=${g}))`)
             .join(';')};` + (scriptUrl ? '\n//# sourceURL=' + scriptUrl : '');
@@ -117,18 +143,18 @@ export const insertIframe = (winId, iframe) => {
         if (environments[winId] &&
             environments[winId].$isInitialized$ &&
             !environments[winId].$isLoading$) {
-            type = getInstanceStateValue(iframe, 1 /* loadErrorStatus */)
-                ? "error" /* errorHandlers */
-                : "load" /* loadHandlers */;
+            type = getInstanceStateValue(iframe, 1 /* StateProp.loadErrorStatus */)
+                ? "error" /* StateProp.errorHandlers */
+                : "load" /* StateProp.loadHandlers */;
             handlers = getInstanceStateValue(iframe, type);
             if (handlers) {
                 handlers.map((handler) => handler({ type }));
             }
         }
         else if (i++ > 2000) {
-            handlers = getInstanceStateValue(iframe, "error" /* errorHandlers */);
+            handlers = getInstanceStateValue(iframe, "error" /* StateProp.errorHandlers */);
             if (handlers) {
-                handlers.map((handler) => handler({ type: "error" /* errorHandlers */ }));
+                handlers.map((handler) => handler({ type: "error" /* StateProp.errorHandlers */ }));
             }
         }
         else {

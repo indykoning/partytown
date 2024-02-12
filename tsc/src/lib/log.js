@@ -102,23 +102,23 @@ const getTargetProp = (target, applyPath) => {
         }
         else if (typeof target[InstanceDataKey] === 'string') {
             let nodeName = target[InstanceDataKey];
-            if (nodeName === "#text" /* Text */) {
+            if (nodeName === "#text" /* NodeName.Text */) {
                 n = 'textNode.';
             }
-            else if (nodeName === "#comment" /* Comment */) {
+            else if (nodeName === "#comment" /* NodeName.Comment */) {
                 n = 'commentNode.';
             }
-            else if (nodeName === "#document" /* Document */) {
+            else if (nodeName === "#document" /* NodeName.Document */) {
                 n = 'document.';
             }
-            else if (nodeName === "html" /* DocumentTypeNode */) {
+            else if (nodeName === "html" /* NodeName.DocumentTypeNode */) {
                 n = 'doctype.';
             }
             else {
                 n = nodeName.toLowerCase() + '.';
             }
         }
-        else if ('nodeType' in target && target.nodeType === 2 /* AttributeNode */) {
+        else if ('nodeType' in target && target.nodeType === 2 /* InterfaceType.AttributeNode */) {
             n = 'attributes.';
         }
         else if (cstrName === 'CanvasRenderingContext2D') {
@@ -186,10 +186,10 @@ const getLogValue = (applyPath, v) => {
                 if (v.nodeType === 1) {
                     return `<${v[InstanceDataKey].toLowerCase()}>`;
                 }
-                if (v.nodeType === 10 /* DocumentTypeNode */) {
+                if (v.nodeType === 10 /* InterfaceType.DocumentTypeNode */) {
                     return `<!DOCTYPE ${v[InstanceDataKey]}>`;
                 }
-                if (v.nodeType <= 11 /* DocumentFragmentNode */) {
+                if (v.nodeType <= 11 /* InterfaceType.DocumentFragmentNode */) {
                     return v[InstanceDataKey];
                 }
             }
@@ -265,13 +265,13 @@ export const logCacheClearMethod = (target, methodName) => {
 };
 export const taskDebugInfo = (target, applyPath, callType) => {
     let m = getTargetProp(target, applyPath);
-    if (callType === 1 /* Blocking */) {
+    if (callType === 1 /* CallType.Blocking */) {
         m += ' (blocking)';
     }
-    else if (callType === 2 /* NonBlocking */) {
+    else if (callType === 2 /* CallType.NonBlocking */) {
         m += ' (non-blocking)';
     }
-    else if (callType === 3 /* NonBlockingNoSideEffect */) {
+    else if (callType === 3 /* CallType.NonBlockingNoSideEffect */) {
         m += ' (non-blocking, no-side-effect)';
     }
     return m.trim();

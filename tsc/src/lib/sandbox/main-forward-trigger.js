@@ -1,4 +1,4 @@
-import { len } from '../utils';
+import { emptyObjectValue, getOriginalBehavior, len, resolvePartytownForwardProperty, } from '../utils';
 import '../types';
 import { serializeForWorker } from './main-serialization';
 export const mainForwardTrigger = (worker, $winId$, win) => {
@@ -7,7 +7,7 @@ export const mainForwardTrigger = (worker, $winId$, win) => {
     let i;
     let mainForwardFn;
     let forwardCall = ($forward$, args) => worker.postMessage([
-        10 /* ForwardMainTrigger */,
+        10 /* WorkerMessageType.ForwardMainTrigger */,
         {
             $winId$,
             $forward$,
@@ -16,12 +16,29 @@ export const mainForwardTrigger = (worker, $winId$, win) => {
     ]);
     win._ptf = undefined;
     forwards.map((forwardProps) => {
+        const [property, { preserveBehavior }] = resolvePartytownForwardProperty(forwardProps);
         mainForwardFn = win;
-        forwardProps.split('.').map((_, i, arr) => {
+        property.split('.').map((_, i, arr) => {
             mainForwardFn = mainForwardFn[arr[i]] =
                 i + 1 < len(arr)
-                    ? mainForwardFn[arr[i]] || (arr[i + 1] === 'push' ? [] : {})
-                    : (...args) => forwardCall(arr, args);
+                    ? mainForwardFn[arr[i]] || emptyObjectValue(arr[i + 1])
+                    : (() => {
+                        let originalFunction = null;
+                        if (preserveBehavior) {
+                            const { methodOrProperty, thisObject } = getOriginalBehavior(win, arr);
+                            if (typeof methodOrProperty === 'function') {
+                                originalFunction = (...args) => methodOrProperty.apply(thisObject, ...args);
+                            }
+                        }
+                        return (...args) => {
+                            let returnValue;
+                            if (originalFunction) {
+                                returnValue = originalFunction(args);
+                            }
+                            forwardCall(arr, args);
+                            return returnValue;
+                        };
+                    })();
         });
     });
     if (queuedForwardCalls) {

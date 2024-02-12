@@ -27,7 +27,7 @@ export const addStorageApi = (win, storageName, storages, isSameOrigin, env) => 
                 getItems().push([key, value]);
             }
             if (isSameOrigin) {
-                callMethod(win, [storageName, 'setItem'], [key, value], 2 /* NonBlocking */);
+                callMethod(win, [storageName, 'setItem'], [key, value], 2 /* CallType.NonBlocking */);
             }
             else {
                 warnCrossOrgin('set', storageName, env);
@@ -39,7 +39,7 @@ export const addStorageApi = (win, storageName, storages, isSameOrigin, env) => 
                 getItems().splice(index, 1);
             }
             if (isSameOrigin) {
-                callMethod(win, [storageName, 'removeItem'], [key], 2 /* NonBlocking */);
+                callMethod(win, [storageName, 'removeItem'], [key], 2 /* CallType.NonBlocking */);
             }
             else {
                 warnCrossOrgin('remove', storageName, env);
@@ -52,7 +52,7 @@ export const addStorageApi = (win, storageName, storages, isSameOrigin, env) => 
         clear() {
             getItems().length = 0;
             if (isSameOrigin) {
-                callMethod(win, [storageName, 'clear'], EMPTY_ARRAY, 2 /* NonBlocking */);
+                callMethod(win, [storageName, 'clear'], EMPTY_ARRAY, 2 /* CallType.NonBlocking */);
             }
             else {
                 warnCrossOrgin('clear', storageName, env);

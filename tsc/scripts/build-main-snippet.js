@@ -1,6 +1,6 @@
-import { fileSize, jsBannerPlugin, versionPlugin } from './utils';
-import { join } from 'path';
-import { minifyPlugin } from './minify';
+import { fileSize, jsBannerPlugin, versionPlugin } from './utils.js';
+import { join } from 'node:path';
+import { minifyPlugin } from './minify.js';
 export function buildMainSnippet(opts) {
     const partytownDebug = {
         file: join(opts.distLibDebugDir, 'partytown.js'),

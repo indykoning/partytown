@@ -37,4 +37,4 @@ export interface BuildOptions {
 export interface PackageJson {
     version: string;
 }
-export declare type MessageType = 'sw' | 'atomics';
+export type MessageType = 'sw' | 'atomics';

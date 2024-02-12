@@ -1,7 +1,7 @@
 import { ApplyPath, CallType, WebWorkerEnvironment, WinId } from './types';
 export declare const warnCrossOrgin: (apiType: 'get' | 'set' | 'remove' | 'clear', apiName: string, env: WebWorkerEnvironment) => void;
 export declare const logMain: (msg: string) => void;
-export declare const logWorker: (msg: string, winId?: string | undefined) => void;
+export declare const logWorker: (msg: string, winId?: WinId) => void;
 export declare const normalizedWinId: (winId: WinId) => number;
 export declare const logWorkerGetter: (target: any, applyPath: ApplyPath, rtnValue: any, restrictedToWorker?: boolean, groupedGetters?: boolean) => void;
 export declare const logWorkerSetter: (target: any, applyPath: ApplyPath, value: any, restrictedToWorker?: boolean) => void;
@@ -9,6 +9,6 @@ export declare const logWorkerCall: (target: any, applyPath: ApplyPath, args: an
 export declare const logWorkerGlobalConstructor: (target: any, cstrName: string, args: any[]) => void;
 export declare const logDimensionCacheClearSetter: (target: any, propName: string) => void;
 export declare const logDimensionCacheClearStyle: (target: any, propName: any) => void;
-export declare const logDimensionCacheClearMethod: (target: any, methodName?: string | undefined) => void;
-export declare const logCacheClearMethod: (target: any, methodName?: string | undefined) => void;
+export declare const logDimensionCacheClearMethod: (target: any, methodName?: string) => void;
+export declare const logCacheClearMethod: (target: any, methodName?: string) => void;
 export declare const taskDebugInfo: (target: any, applyPath: ApplyPath, callType: CallType) => string;

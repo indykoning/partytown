@@ -1,9 +1,9 @@
-import { suite as uvuSuite } from 'uvu';
-import { environments, webWorkerCtx } from '../../src/lib/web-worker/worker-constants';
 import { createWindow } from 'domino';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { suite as uvuSuite } from 'uvu';
 import { randomId } from '../../src/lib/utils';
+import { environments, webWorkerCtx } from '../../src/lib/web-worker/worker-constants';
 export const suite = (title) => {
     const s = uvuSuite(title);
     if (_partytownSnippet == null) {

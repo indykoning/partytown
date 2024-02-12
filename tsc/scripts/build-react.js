@@ -1,5 +1,5 @@
-import { submodulePackageJson, submodulePath } from './utils';
-import { join } from 'path';
+import { submodulePackageJson, submodulePath } from './utils.js';
+import { join } from 'node:path';
 export function buildReact(opts) {
     return {
         input: join(opts.tscReactDir, 'index.js'),

@@ -1,4 +1,4 @@
-import { createElementFromConstructor, getConstructorName, getNodeName, isValidMemberName, len, noop, } from '../utils';
+import { createElementFromConstructor, getConstructorName, getNodeName, isValidMemberName, len, noop, serializeConfig, } from '../utils';
 import { config, docImpl, libPath, mainWindow } from './main-globals';
 import '../types';
 export const readMainPlatform = () => {
@@ -22,9 +22,9 @@ export const readMainPlatform = () => {
         [screen.orientation],
         [mainWindow.visualViewport],
         // global constructors
-        [intersectionObserver, 12 /* EnvGlobalConstructor */],
-        [mutationObserver, 12 /* EnvGlobalConstructor */],
-        [resizeObserver, 12 /* EnvGlobalConstructor */],
+        [intersectionObserver, 12 /* InterfaceType.EnvGlobalConstructor */],
+        [mutationObserver, 12 /* InterfaceType.EnvGlobalConstructor */],
+        [resizeObserver, 12 /* InterfaceType.EnvGlobalConstructor */],
         // dom implementations
         [textNode],
         [comment],
@@ -42,15 +42,7 @@ export const readMainPlatform = () => {
         readImplementation('Window', mainWindow),
         readImplementation('Node', textNode),
     ];
-    const $config$ = JSON.stringify(config, (k, v) => {
-        if (typeof v === 'function') {
-            v = String(v);
-            if (v.startsWith(k + '(')) {
-                v = 'function ' + v;
-            }
-        }
-        return v;
-    });
+    const $config$ = serializeConfig(config);
     const initWebWorkerData = {
         $config$,
         $interfaces$: readImplementations(impls, initialInterfaces),
@@ -71,8 +63,8 @@ export const readMainInterfaces = () => {
         .map((elm) => [elm]);
     return readImplementations(elms, []);
 };
-const cstrs = new Set(['Object']);
 const readImplementations = (impls, interfaces) => {
+    const cstrs = new Set(['Object']);
     const cstrImpls = impls
         .filter((implData) => implData[0])
         .map((implData) => {
@@ -115,12 +107,12 @@ const readImplementationMember = (interfaceMembers, implementation, memberName, 
             if (memberType === 'function') {
                 if (String(value).includes(`[native`) ||
                     Object.getPrototypeOf(implementation)[memberName]) {
-                    interfaceMembers.push([memberName, 5 /* Function */]);
+                    interfaceMembers.push([memberName, 5 /* InterfaceType.Function */]);
                 }
             }
             else if (memberType === 'object' && value != null) {
                 cstrName = getConstructorName(value);
-                if (cstrName !== 'Object' && self[cstrName]) {
+                if (cstrName !== 'Object' && cstrName !== 'Function' && self[cstrName]) {
                     interfaceMembers.push([memberName, value.nodeType || cstrName]);
                 }
             }
@@ -128,10 +120,10 @@ const readImplementationMember = (interfaceMembers, implementation, memberName, 
                 // everything else that's not a symbol
                 if (memberName.toUpperCase() === memberName) {
                     // static property, let's get its value
-                    interfaceMembers.push([memberName, 6 /* Property */, value]);
+                    interfaceMembers.push([memberName, 6 /* InterfaceType.Property */, value]);
                 }
                 else {
-                    interfaceMembers.push([memberName, 6 /* Property */]);
+                    interfaceMembers.push([memberName, 6 /* InterfaceType.Property */]);
                 }
             }
         }
@@ -161,9 +153,9 @@ const addGlobalConstructorUsingPrototype = ($interfaces$, mainWindow, cstrName) 
             'Object',
             Object.keys(mainWindow[cstrName].prototype).map((propName) => [
                 propName,
-                6 /* Property */,
+                6 /* InterfaceType.Property */,
             ]),
-            12 /* EnvGlobalConstructor */,
+            12 /* InterfaceType.EnvGlobalConstructor */,
         ]);
     }
 };

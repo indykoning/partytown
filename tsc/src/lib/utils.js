@@ -94,3 +94,68 @@ export const isValidUrl = (url) => {
         return false;
     }
 };
+const defaultPartytownForwardPropertySettings = {
+    preserveBehavior: false,
+};
+export const resolvePartytownForwardProperty = (propertyOrPropertyWithSettings) => {
+    if (typeof propertyOrPropertyWithSettings === 'string') {
+        return [propertyOrPropertyWithSettings, defaultPartytownForwardPropertySettings];
+    }
+    const [property, settings = defaultPartytownForwardPropertySettings] = propertyOrPropertyWithSettings;
+    return [property, { ...defaultPartytownForwardPropertySettings, ...settings }];
+};
+export const getOriginalBehavior = (window, properties) => {
+    let thisObject = window;
+    for (let i = 0; i < properties.length - 1; i += 1) {
+        thisObject = thisObject[properties[i]];
+    }
+    return {
+        thisObject,
+        methodOrProperty: properties.length > 0 ? thisObject[properties[properties.length - 1]] : undefined,
+    };
+};
+const getMethods = (obj) => {
+    const properties = new Set();
+    let currentObj = obj;
+    do {
+        Object.getOwnPropertyNames(currentObj).forEach((item) => {
+            if (typeof currentObj[item] === 'function') {
+                properties.add(item);
+            }
+        });
+    } while ((currentObj = Object.getPrototypeOf(currentObj)) !== Object.prototype);
+    return Array.from(properties);
+};
+const arrayMethods = Object.freeze(getMethods([]));
+export const emptyObjectValue = (propertyName) => {
+    if (arrayMethods.includes(propertyName)) {
+        return [];
+    }
+    return {};
+};
+function escapeRegExp(input) {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+export function testIfMustLoadScriptOnMainThread(config, value) {
+    var _a, _b;
+    return ((_b = (_a = config.loadScriptsOnMainThread) === null || _a === void 0 ? void 0 : _a.map(([type, value]) => new RegExp(type === 'string' ? escapeRegExp(value) : value)).some((regexp) => regexp.test(value))) !== null && _b !== void 0 ? _b : false);
+}
+export function serializeConfig(config) {
+    return JSON.stringify(config, (key, value) => {
+        if (typeof value === 'function') {
+            value = String(value);
+            if (value.startsWith(key + '(')) {
+                value = 'function ' + value;
+            }
+        }
+        if (key === 'loadScriptsOnMainThread') {
+            value = value.map((scriptUrl) => Array.isArray(scriptUrl)
+                ? scriptUrl
+                : [
+                    typeof scriptUrl === 'string' ? 'string' : 'regexp',
+                    typeof scriptUrl === 'string' ? scriptUrl : scriptUrl.source,
+                ]);
+        }
+        return value;
+    });
+}

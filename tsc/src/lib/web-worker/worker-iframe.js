@@ -20,7 +20,7 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement, env) => {
         },
         src: {
             get() {
-                let src = getInstanceStateValue(this, 0 /* src */);
+                let src = getInstanceStateValue(this, 0 /* StateProp.src */);
                 if (src && src.startsWith('javascript:')) {
                     return src;
                 }
@@ -32,7 +32,7 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement, env) => {
                     return;
                 }
                 if (src.startsWith('javascript:')) {
-                    setInstanceStateValue(this, 0 /* src */, src);
+                    setInstanceStateValue(this, 0 /* StateProp.src */, src);
                     return;
                 }
                 if (!src.startsWith('about:')) {
@@ -41,7 +41,7 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement, env) => {
                     let env = getIframeEnv(this);
                     env.$location$.href = src = resolveUrl(env, src, 'iframe');
                     env.$isLoading$ = 1;
-                    setInstanceStateValue(this, 1 /* loadErrorStatus */, undefined);
+                    setInstanceStateValue(this, 1 /* StateProp.loadErrorStatus */, undefined);
                     xhr.open('GET', src, false);
                     xhr.send();
                     xhrStatus = xhr.status;
@@ -50,10 +50,10 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement, env) => {
                             replaceScriptWithPartytownScript(xhr.responseText) +
                             getPartytownScript());
                         sendToMain(true);
-                        webWorkerCtx.$postMessage$([7 /* InitializeNextScript */, env.$winId$]);
+                        webWorkerCtx.$postMessage$([7 /* WorkerMessageType.InitializeNextScript */, env.$winId$]);
                     }
                     else {
-                        setInstanceStateValue(this, 1 /* loadErrorStatus */, xhrStatus);
+                        setInstanceStateValue(this, 1 /* StateProp.loadErrorStatus */, xhrStatus);
                         env.$isLoading$ = 0;
                     }
                 }

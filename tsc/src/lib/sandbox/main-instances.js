@@ -19,16 +19,16 @@ export const getInstance = (winId, instanceId, win, doc, docId) => {
         }
         doc = win.$window$.document;
         docId = instanceId.split('.').pop();
-        if (docId === "d" /* document */) {
+        if (docId === "d" /* WinDocId.document */) {
             return doc;
         }
-        if (docId === "e" /* documentElement */) {
+        if (docId === "e" /* WinDocId.documentElement */) {
             return doc.documentElement;
         }
-        if (docId === "h" /* head */) {
+        if (docId === "h" /* WinDocId.head */) {
             return doc.head;
         }
-        if (docId === "b" /* body */) {
+        if (docId === "b" /* WinDocId.body */) {
             return doc.body;
         }
     }

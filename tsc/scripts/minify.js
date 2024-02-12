@@ -1,4 +1,4 @@
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 export function minifyPlugin(opts, debug) {
     if (debug) {
         return [terser(minifyOptions(opts, true))];

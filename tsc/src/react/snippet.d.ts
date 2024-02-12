@@ -17,4 +17,4 @@ export interface PartytownProps extends PartytownConfig {
  *
  * @public
  */
-export declare const Partytown: (props?: PartytownProps) => any;
+export declare const Partytown: ({ nonce, ...props }?: PartytownProps) => any;

@@ -1,5 +1,5 @@
-import { debug } from '../utils';
-export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout, scripts, sandbox, mainForwardFn, isReady) {
+import { debug, emptyObjectValue, getOriginalBehavior, resolvePartytownForwardProperty, } from '../utils';
+export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout, scripts, sandbox, mainForwardFn = win, isReady) {
     // ES5 just so IE11 doesn't choke on arrow fns
     function ready() {
         if (!isReady) {
@@ -63,7 +63,11 @@ export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout
     function loadSandbox(isAtomics) {
         sandbox = doc.createElement(isAtomics ? 'script' : 'iframe');
         if (!isAtomics) {
-            sandbox.setAttribute('style', 'display:block;width:0;height:0;border:0;visibility:hidden');
+            sandbox.style.display = 'block';
+            sandbox.style.width = '0';
+            sandbox.style.height = '0';
+            sandbox.style.border = '0';
+            sandbox.style.visibility = 'hidden';
             sandbox.setAttribute('aria-hidden', !0);
         }
         sandbox.src =
@@ -83,12 +87,19 @@ export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout
         // remove any previously patched functions
         if (top == win) {
             (config.forward || []).map(function (forwardProps) {
-                delete win[forwardProps.split('.')[0]];
+                const [property] = resolvePartytownForwardProperty(forwardProps);
+                delete win[property.split('.')[0]];
             });
         }
         for (i = 0; i < scripts.length; i++) {
             script = doc.createElement('script');
             script.innerHTML = scripts[i].innerHTML;
+            // We don't need to set a `nonce` on sandbox script since it is loaded via
+            // the `src` attribute. However, we do need to set a `nonce` on the current
+            // script because it contains an inline script. This action ensures that the
+            // script can still be executed even when inline scripts are blocked
+            // (assuming `unsafe-inline` is disabled and `nonce-*` is used instead).
+            script.nonce = config.nonce;
             doc.head.appendChild(script);
         }
         if (sandbox) {
@@ -104,17 +115,30 @@ export function snippet(win, doc, nav, top, useAtomics, config, libPath, timeout
         // this is the top window
         // patch the functions that'll be forwarded to the worker
         (config.forward || []).map(function (forwardProps) {
+            const [property, { preserveBehavior }] = resolvePartytownForwardProperty(forwardProps);
             mainForwardFn = win;
-            forwardProps.split('.').map(function (_, i, forwardPropsArr) {
+            property.split('.').map(function (_, i, forwardPropsArr) {
                 mainForwardFn = mainForwardFn[forwardPropsArr[i]] =
                     i + 1 < forwardPropsArr.length
-                        ? forwardPropsArr[i + 1] == 'push'
-                            ? []
-                            : mainForwardFn[forwardPropsArr[i]] || {}
-                        : function () {
-                            // queue these calls to be forwarded on later, after Partytown is ready
-                            (win._ptf = win._ptf || []).push(forwardPropsArr, arguments);
-                        };
+                        ? mainForwardFn[forwardPropsArr[i]] || emptyObjectValue(forwardPropsArr[i + 1])
+                        : (() => {
+                            let originalFunction = null;
+                            if (preserveBehavior) {
+                                const { methodOrProperty, thisObject } = getOriginalBehavior(win, forwardPropsArr);
+                                if (typeof methodOrProperty === 'function') {
+                                    originalFunction = (...args) => methodOrProperty.apply(thisObject, ...args);
+                                }
+                            }
+                            return function () {
+                                let returnValue;
+                                if (originalFunction) {
+                                    returnValue = originalFunction(arguments);
+                                }
+                                // queue these calls to be forwarded on later, after Partytown is ready
+                                (win._ptf = win._ptf || []).push(forwardPropsArr, arguments);
+                                return returnValue;
+                            };
+                        })();
             });
         });
     }

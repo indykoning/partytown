@@ -30,7 +30,7 @@ export const createCSSStyleDeclarationCstr = (win, WorkerBase, cstrName) => {
         }
         setProperty(...args) {
             this[InstanceDataKey][args[0]] = args[1];
-            callMethod(this, ['setProperty'], args, 2 /* NonBlocking */);
+            callMethod(this, ['setProperty'], args, 2 /* CallType.NonBlocking */);
             logDimensionCacheClearStyle(this, args[0]);
             cachedDimensions.clear();
         }
@@ -39,7 +39,7 @@ export const createCSSStyleDeclarationCstr = (win, WorkerBase, cstrName) => {
         }
         removeProperty(propName) {
             let value = this[InstanceDataKey][propName];
-            callMethod(this, ['removeProperty'], [propName], 2 /* NonBlocking */);
+            callMethod(this, ['removeProperty'], [propName], 2 /* CallType.NonBlocking */);
             logDimensionCacheClearStyle(this, propName);
             cachedDimensions.clear();
             this[InstanceDataKey][propName] = undefined;

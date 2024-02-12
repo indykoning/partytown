@@ -1,7 +1,7 @@
-import { fileSize, jsBannerPlugin, syncCommunicationModulesPlugin, versionPlugin, watchDir, } from './utils';
-import { join } from 'path';
-import { minifyPlugin } from './minify';
-import { webWorkerBlobUrlPlugin } from './build-web-worker';
+import { fileSize, jsBannerPlugin, syncCommunicationModulesPlugin, versionPlugin, watchDir, } from './utils.js';
+import { join } from 'node:path';
+import { minifyPlugin } from './minify.js';
+import { webWorkerBlobUrlPlugin } from './build-web-worker.js';
 export function buildAtomics(opts) {
     const rollups = [];
     rollups.push(buildAtomicsDebug(opts));

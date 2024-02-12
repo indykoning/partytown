@@ -2,7 +2,7 @@ import '../types';
 export function forwardLocationChange($winId$, env, data) {
     const history = env.$window$.history;
     switch (data.type) {
-        case 0 /* PushState */: {
+        case 0 /* LocationUpdateType.PushState */: {
             env.$propagateHistoryChange$ = false;
             try {
                 history.pushState(data.state, '', data.newUrl);
@@ -11,7 +11,7 @@ export function forwardLocationChange($winId$, env, data) {
             env.$propagateHistoryChange$ = true;
             break;
         }
-        case 1 /* ReplaceState */: {
+        case 1 /* LocationUpdateType.ReplaceState */: {
             env.$propagateHistoryChange$ = false;
             try {
                 history.replaceState(data.state, '', data.newUrl);

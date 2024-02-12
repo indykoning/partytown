@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
 export function buildApi(opts) {
     console.log('👑 Generate API types\n');

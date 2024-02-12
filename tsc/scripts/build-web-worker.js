@@ -1,8 +1,9 @@
 import { rollup } from 'rollup';
-import { getJsBanner, onwarn, syncCommunicationModulesPlugin, versionPlugin, } from './utils';
-import { join } from 'path';
-import { writeFile } from 'fs-extra';
-import { minifyPlugin } from './minify';
+import { getJsBanner, onwarn, syncCommunicationModulesPlugin, versionPlugin, } from './utils.js';
+import { join } from 'node:path';
+import fsExtra from 'fs-extra';
+import { minifyPlugin } from './minify.js';
+const { writeFile } = fsExtra;
 export async function buildWebWorker(opts, msgType, debug) {
     const build = await rollup({
         input: join(opts.tscLibDir, 'web-worker', 'index.js'),

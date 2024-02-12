@@ -21,7 +21,7 @@ export const registerWindow = (worker, $winId$, $window$) => {
         };
         const sendInitEnvData = () => {
             worker.postMessage([
-                5 /* InitializeEnvironment */,
+                5 /* WorkerMessageType.InitializeEnvironment */,
                 {
                     $winId$,
                     $parentWinId$,
@@ -41,7 +41,7 @@ export const registerWindow = (worker, $winId$, $window$) => {
         const replaceState = history.replaceState.bind(history);
         const onLocationChange = (type, state, newUrl, oldUrl) => () => {
             worker.postMessage([
-                13 /* LocationUpdate */,
+                13 /* WorkerMessageType.LocationUpdate */,
                 {
                     $winId$,
                     type,
@@ -54,22 +54,22 @@ export const registerWindow = (worker, $winId$, $window$) => {
         };
         history.pushState = (state, _, newUrl) => {
             pushState(state, _, newUrl);
-            onInitialised(onLocationChange(0 /* PushState */, state, newUrl === null || newUrl === void 0 ? void 0 : newUrl.toString()));
+            onInitialised(onLocationChange(0 /* LocationUpdateType.PushState */, state, newUrl === null || newUrl === void 0 ? void 0 : newUrl.toString()));
         };
         history.replaceState = (state, _, newUrl) => {
             replaceState(state, _, newUrl);
-            onInitialised(onLocationChange(1 /* ReplaceState */, state, newUrl === null || newUrl === void 0 ? void 0 : newUrl.toString()));
+            onInitialised(onLocationChange(1 /* LocationUpdateType.ReplaceState */, state, newUrl === null || newUrl === void 0 ? void 0 : newUrl.toString()));
         };
         $window$.addEventListener('popstate', (event) => {
-            onInitialised(onLocationChange(2 /* PopState */, event.state));
+            onInitialised(onLocationChange(2 /* LocationUpdateType.PopState */, event.state));
         });
         $window$.addEventListener('hashchange', (event) => {
-            onInitialised(onLocationChange(3 /* HashChange */, {}, event.newURL, event.oldURL));
+            onInitialised(onLocationChange(3 /* LocationUpdateType.HashChange */, {}, event.newURL, event.oldURL));
         });
         $window$.addEventListener('ptupdate', () => {
             readNextScript(worker, winCtxs[$winId$]);
         });
-        doc.addEventListener('visibilitychange', () => worker.postMessage([14 /* DocumentVisibilityState */, $winId$, doc.visibilityState]));
+        doc.addEventListener('visibilitychange', () => worker.postMessage([14 /* WorkerMessageType.DocumentVisibilityState */, $winId$, doc.visibilityState]));
         winCtxs[$winId$] = {
             $winId$,
             $window$,

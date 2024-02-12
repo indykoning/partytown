@@ -38,7 +38,7 @@ export const mainAccessHandler = async (worker, accessReq) => {
                     callback();
                 });
             }
-            if (applyPath[0] === 1 /* GlobalConstructor */ &&
+            if (applyPath[0] === 1 /* ApplyPathType.GlobalConstructor */ &&
                 applyPath[1] in winCtxs[winId].$window$) {
                 setInstanceId(new winCtxs[winId].$window$[applyPath[1]](...deserializeFromWorker(worker, applyPath[2])), task.$instanceId$);
             }
@@ -121,7 +121,7 @@ const applyToInstance = (worker, winId, instance, applyPath, isLast, groupedGett
                     // current is the member name, but not a method
                     instance = instance[current];
                 }
-                else if (next === 0 /* SetValue */) {
+                else if (next === 0 /* ApplyPathType.SetValue */) {
                     // setter
                     // previous is the setter name
                     // current is the setter value

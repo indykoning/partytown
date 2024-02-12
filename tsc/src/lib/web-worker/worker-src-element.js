@@ -22,20 +22,20 @@ export const HTMLSrcElementDescriptorMap = {
     },
     onload: {
         get() {
-            let callbacks = getInstanceStateValue(this, "load" /* loadHandlers */);
+            let callbacks = getInstanceStateValue(this, "load" /* StateProp.loadHandlers */);
             return (callbacks && callbacks[0]) || null;
         },
         set(cb) {
-            setInstanceStateValue(this, "load" /* loadHandlers */, cb ? [cb] : null);
+            setInstanceStateValue(this, "load" /* StateProp.loadHandlers */, cb ? [cb] : null);
         },
     },
     onerror: {
         get() {
-            let callbacks = getInstanceStateValue(this, "error" /* errorHandlers */);
+            let callbacks = getInstanceStateValue(this, "error" /* StateProp.errorHandlers */);
             return (callbacks && callbacks[0]) || null;
         },
         set(cb) {
-            setInstanceStateValue(this, "error" /* errorHandlers */, cb ? [cb] : null);
+            setInstanceStateValue(this, "error" /* StateProp.errorHandlers */, cb ? [cb] : null);
         },
     },
     getAttribute: {

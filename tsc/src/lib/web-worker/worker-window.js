@@ -63,15 +63,15 @@ class TagAssistantApi {
             setReceiver: (r) => {
                 gtmDebugLog('set receiver', r);
                 receiverFn = r;
-                callMethod(win, ['__partytown_gtm_debug', 'activate'], [], 1 /* Blocking */);
+                callMethod(win, ['__partytown_gtm_debug', 'activate'], [], 1 /* CallType.Blocking */);
             },
             sendMessage: (...args) => {
                 gtmDebugLog('send message', args);
-                return callMethod(win, ['__partytown_gtm_debug', 'sendMessage'], args, 1 /* Blocking */);
+                return callMethod(win, ['__partytown_gtm_debug', 'sendMessage'], args, 1 /* CallType.Blocking */);
             },
             disconnect: (...args) => {
                 gtmDebugLog('disconnect', args);
-                return callMethod(win, ['__partytown_gtm_debug', 'disconnect'], args, 1 /* Blocking */);
+                return callMethod(win, ['__partytown_gtm_debug', 'disconnect'], args, 1 /* CallType.Blocking */);
             }
         };
     }
@@ -92,7 +92,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
             this[ApplyPathKey] = applyPath || [];
             this[InstanceDataKey] = instanceData || cstrNodeName;
             this[NamespaceKey] = namespace || cstrNamespace;
-            this[InstanceStateKey] = cstrPrevInstance && cstrPrevInstance[InstanceStateKey] || {};
+            this[InstanceStateKey] = (cstrPrevInstance && cstrPrevInstance[InstanceStateKey]) || {};
             cstrInstanceId = cstrNodeName = cstrNamespace = undefined;
         }
     };
@@ -127,6 +127,16 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
     const WorkerWindow = defineConstructorName(class extends WorkerBase {
         constructor() {
             super($winId$, $winId$);
+            this.addEventListener = (...args) => {
+                if (args[0] === 'load') {
+                    if (env.$runWindowLoadEvent$) {
+                        setTimeout(() => args[1]({ type: 'load' }));
+                    }
+                }
+                else {
+                    callMethod(this, ['addEventListener'], args, 2 /* CallType.NonBlocking */);
+                }
+            };
             let win = this;
             let value;
             let historyState;
@@ -170,7 +180,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
                         : superCstrName === 'Object'
                             ? WorkerBase
                             : win[superCstrName];
-                const Cstr = (win[cstrName] = defineConstructorName(interfaceType === 12 /* EnvGlobalConstructor */
+                const Cstr = (win[cstrName] = defineConstructorName(interfaceType === 12 /* InterfaceType.EnvGlobalConstructor */
                     ? class extends WorkerBase {
                         // create the constructor and set as a prop on window
                         constructor(...args) {
@@ -207,7 +217,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
                         }
                         else {
                             // interface type
-                            if (memberType === 5 /* Function */) {
+                            if (memberType === 5 /* InterfaceType.Function */) {
                                 // method that should access main
                                 definePrototypeValue(Cstr, memberName, function (...args) {
                                     return callMethod(this, [memberName], args);
@@ -315,10 +325,10 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
                     // like: <script>globalProp = true</script>
                     true,
                 }),
-                $document$: $createNode$("#document" /* Document */, $winId$ + '.' + "d" /* document */),
-                $documentElement$: $createNode$("HTML" /* DocumentElement */, $winId$ + '.' + "e" /* documentElement */),
-                $head$: $createNode$("HEAD" /* Head */, $winId$ + '.' + "h" /* head */),
-                $body$: $createNode$("BODY" /* Body */, $winId$ + '.' + "b" /* body */),
+                $document$: $createNode$("#document" /* NodeName.Document */, $winId$ + '.' + "d" /* WinDocId.document */),
+                $documentElement$: $createNode$("HTML" /* NodeName.DocumentElement */, $winId$ + '.' + "e" /* WinDocId.documentElement */),
+                $head$: $createNode$("HEAD" /* NodeName.Head */, $winId$ + '.' + "h" /* WinDocId.head */),
+                $body$: $createNode$("BODY" /* NodeName.Body */, $winId$ + '.' + "b" /* WinDocId.body */),
                 $location$,
                 $visibilityState$,
                 $isSameOrigin$,
@@ -378,16 +388,6 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
             win.tagAssistantApi = new TagAssistantApi(win);
             win.Worker = undefined;
         }
-        addEventListener(...args) {
-            if (args[0] === 'load') {
-                if (env.$runWindowLoadEvent$) {
-                    setTimeout(() => args[1]({ type: 'load' }));
-                }
-            }
-            else {
-                callMethod(this, ['addEventListener'], args, 2 /* NonBlocking */);
-            }
-        }
         get body() {
             return env.$body$;
         }
@@ -414,7 +414,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
             else {
                 // the winId of an iframe's window is the same
                 // as the instanceId of the containing iframe element
-                return getOrCreateNodeInstance($parentWinId$, $winId$, "IFRAME" /* IFrame */);
+                return getOrCreateNodeInstance($parentWinId$, $winId$, "IFRAME" /* NodeName.IFrame */);
             }
         }
         get globalThis() {
@@ -462,7 +462,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
                 });
                 args = args.slice(1);
             }
-            callMethod(this, ['postMessage'], args, 3 /* NonBlockingNoSideEffect */);
+            callMethod(this, ['postMessage'], args, 3 /* CallType.NonBlockingNoSideEffect */);
         }
         get self() {
             return env.$window$;
@@ -520,7 +520,7 @@ export const createWindow = ($winId$, $parentWinId$, url, $visibilityState$, isI
     const WorkerEventTargetProxy = class extends WorkerBase {
     };
     eventTargetMethods.map((methodName) => (WorkerEventTargetProxy.prototype[methodName] = function (...args) {
-        return callMethod(this, [methodName], args, 2 /* NonBlocking */);
+        return callMethod(this, [methodName], args, 2 /* CallType.NonBlocking */);
     }));
     cachedProps(WorkerWindow, 'devicePixelRatio');
     cachedDimensionProps(WorkerWindow);

@@ -1,4 +1,4 @@
-import type { ApplyPath, RandomId } from './types';
+import type { ApplyPath, MainWindow, PartytownConfig, PartytownForwardProperty, PartytownForwardPropertySettings, PartytownInternalConfig, RandomId, StringIndexable } from './types';
 export declare const debug: boolean;
 export declare const isPromise: (v: any) => v is Promise<unknown>;
 export declare const noop: () => void;
@@ -8,7 +8,7 @@ export declare const len: (obj: {
 export declare const getConstructorName: (obj: Object) => string;
 export declare const startsWith: (str: string, val: string) => boolean;
 export declare const isValidMemberName: (memberName: string) => boolean;
-export declare const getLastMemberName: (applyPath: ApplyPath, i?: number | undefined) => string;
+export declare const getLastMemberName: (applyPath: ApplyPath, i?: number) => string;
 export declare const getNodeName: (node: Node) => string;
 export declare const EMPTY_ARRAY: never[];
 export declare const randomId: RandomId;
@@ -27,5 +27,15 @@ export declare const defineConstructorName: (Cstr: any, value: string) => any;
 export declare const definePrototypeProperty: (Cstr: any, memberName: string, descriptor: PropertyDescriptor) => any;
 export declare const definePrototypePropertyDescriptor: (Cstr: any, propertyDescriptorMap: any) => any;
 export declare const definePrototypeValue: (Cstr: any, memberName: string, value: any) => any;
-export declare const createElementFromConstructor: (doc: Document, interfaceName: string, r?: RegExpMatchArray | null | undefined, tag?: string | undefined) => HTMLElement | SVGElement | undefined;
+export declare const createElementFromConstructor: (doc: Document, interfaceName: string, r?: RegExpMatchArray | null, tag?: string) => HTMLElement | SVGElement | undefined;
 export declare const isValidUrl: (url: any) => boolean;
+export declare const resolvePartytownForwardProperty: (propertyOrPropertyWithSettings: PartytownForwardProperty) => [string, PartytownForwardPropertySettings];
+type GetOriginalBehaviorReturn = {
+    thisObject: StringIndexable;
+    methodOrProperty: Function | Record<string, unknown> | undefined;
+};
+export declare const getOriginalBehavior: (window: MainWindow, properties: string[]) => GetOriginalBehaviorReturn;
+export declare const emptyObjectValue: (propertyName: string) => [] | {};
+export declare function testIfMustLoadScriptOnMainThread(config: PartytownInternalConfig, value: string): boolean;
+export declare function serializeConfig(config: PartytownConfig): string;
+export {};

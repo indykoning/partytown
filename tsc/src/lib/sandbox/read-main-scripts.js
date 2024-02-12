@@ -38,7 +38,7 @@ export const readNextScript = (worker, winCtx) => {
             else {
                 scriptData.$content$ = scriptElm.innerHTML;
             }
-            worker.postMessage([7 /* InitializeNextScript */, scriptData]);
+            worker.postMessage([7 /* WorkerMessageType.InitializeNextScript */, scriptData]);
         }
         else {
             if (!winCtx.$isInitialized$) {
@@ -51,7 +51,7 @@ export const readNextScript = (worker, winCtx) => {
                     logMain(`Executed ${winType} window ${normalizedWinId($winId$)} environment scripts in ${(performance.now() - winCtx.$startTime$).toFixed(1)}ms`);
                 }
             }
-            worker.postMessage([8 /* InitializedScripts */, $winId$]);
+            worker.postMessage([8 /* WorkerMessageType.InitializedScripts */, $winId$]);
         }
     }
     else {

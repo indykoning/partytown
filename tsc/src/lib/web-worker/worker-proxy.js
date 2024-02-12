@@ -19,14 +19,14 @@ const queue = (instance, $applyPath$, callType, $assignInstanceId$, $groupedGett
     });
     if (debug) {
         taskQueue[len(taskQueue) - 1].$debug$ = taskDebugInfo(instance, $applyPath$, callType);
-        if (buffer && callType !== 3 /* NonBlockingNoSideEffect */) {
+        if (buffer && callType !== 3 /* CallType.NonBlockingNoSideEffect */) {
             console.error('buffer must be sent NonBlockingNoSideEffect');
         }
     }
-    if (callType === 3 /* NonBlockingNoSideEffect */) {
+    if (callType === 3 /* CallType.NonBlockingNoSideEffect */) {
         // non-blocking and has no side effects (like an event)
         webWorkerCtx.$postMessage$([
-            12 /* AsyncAccessRequest */,
+            12 /* WorkerMessageType.AsyncAccessRequest */,
             {
                 $msgId$: randomId(),
                 $tasks$: [...taskQueue],
@@ -34,7 +34,7 @@ const queue = (instance, $applyPath$, callType, $assignInstanceId$, $groupedGett
         ], buffer ? [buffer instanceof ArrayBuffer ? buffer : buffer.buffer] : undefined);
         taskQueue.length = 0;
     }
-    else if (callType === 1 /* Blocking */) {
+    else if (callType === 1 /* CallType.Blocking */) {
         // this task is blocking, so let's send to the main and return the result
         return sendToMain(true);
     }
@@ -67,7 +67,7 @@ export const sendToMain = (isBlocking) => {
             return isPromise ? Promise.resolve(rtnValue) : rtnValue;
         }
         // async call, fire and forget, returns undefined
-        webWorkerCtx.$postMessage$([12 /* AsyncAccessRequest */, accessReq]);
+        webWorkerCtx.$postMessage$([12 /* WorkerMessageType.AsyncAccessRequest */, accessReq]);
     }
 };
 export const getter = (instance, applyPath, groupedGetters, rtnValue) => {
@@ -77,7 +77,7 @@ export const getter = (instance, applyPath, groupedGetters, rtnValue) => {
             return rtnValue;
         }
     }
-    rtnValue = queue(instance, applyPath, 1 /* Blocking */, undefined, groupedGetters);
+    rtnValue = queue(instance, applyPath, 1 /* CallType.Blocking */, undefined, groupedGetters);
     logWorkerGetter(instance, applyPath, rtnValue, false, !!groupedGetters);
     return rtnValue;
 };
@@ -100,9 +100,9 @@ export const setter = (instance, applyPath, value, hookSetterValue) => {
         cachedDimensions.clear();
         logDimensionCacheClearSetter(instance, applyPath[applyPath.length - 1]);
     }
-    applyPath = [...applyPath, serializeInstanceForMain(instance, value), 0 /* SetValue */];
+    applyPath = [...applyPath, serializeInstanceForMain(instance, value), 0 /* ApplyPathType.SetValue */];
     logWorkerSetter(instance, applyPath, value);
-    queue(instance, applyPath, 2 /* NonBlocking */);
+    queue(instance, applyPath, 2 /* CallType.NonBlocking */);
 };
 export const callMethod = (instance, applyPath, args, callType, assignInstanceId, buffer, rtnValue, methodName) => {
     if (webWorkerCtx.$config$.apply) {
@@ -115,7 +115,7 @@ export const callMethod = (instance, applyPath, args, callType, assignInstanceId
     applyPath = [...applyPath, serializeInstanceForMain(instance, args)];
     callType =
         callType ||
-            (nonBlockingMethods.includes(methodName) ? 2 /* NonBlocking */ : 1 /* Blocking */);
+            (nonBlockingMethods.includes(methodName) ? 2 /* CallType.NonBlocking */ : 1 /* CallType.Blocking */);
     if (methodName === 'setAttribute' && hasInstanceStateValue(instance, args[0])) {
         setInstanceStateValue(instance, args[0], args[1]);
     }
@@ -125,7 +125,7 @@ export const callMethod = (instance, applyPath, args, callType, assignInstanceId
         logCacheClearMethod(instance, methodName);
     }
     else if (dimensionChangingMethodNames.includes(methodName)) {
-        callType = 2 /* NonBlocking */;
+        callType = 2 /* CallType.NonBlocking */;
         cachedDimensions.clear();
         logDimensionCacheClearMethod(instance, methodName);
     }
@@ -135,7 +135,7 @@ export const callMethod = (instance, applyPath, args, callType, assignInstanceId
 };
 export const constructGlobal = (instance, cstrName, args) => {
     logWorkerGlobalConstructor(instance, cstrName, args);
-    queue(instance, [1 /* GlobalConstructor */, cstrName, serializeInstanceForMain(instance, args)], 1 /* Blocking */);
+    queue(instance, [1 /* ApplyPathType.GlobalConstructor */, cstrName, serializeInstanceForMain(instance, args)], 1 /* CallType.Blocking */);
 };
 const createHookOptions = (instance, applyPath) => ({
     name: applyPath.join('.'),

@@ -1,22 +1,22 @@
-export declare type CreateWorker = (workerName: string) => Worker;
-export declare type Messenger = (receiveMessage: MessengerRequestCallback) => Promise<MessengerHandler | null>;
-export declare type MessengerRequestCallback = (accessReq: MainAccessRequest, responseCallback: MessengerResponseCallback) => void;
-export declare type MessengerHandler = (worker: PartytownWebWorker, msg: MessageFromWorkerToSandbox) => void;
-export declare type MessengerResponseCallback = (accessRsp: MainAccessResponse) => void;
-export declare type WinId = string;
-export declare type InstanceId = string;
-export declare type RefId = string;
+export type CreateWorker = (workerName: string) => Worker;
+export type Messenger = (receiveMessage: MessengerRequestCallback) => Promise<MessengerHandler | null>;
+export type MessengerRequestCallback = (accessReq: MainAccessRequest, responseCallback: MessengerResponseCallback) => void;
+export type MessengerHandler = (worker: PartytownWebWorker, msg: MessageFromWorkerToSandbox) => void;
+export type MessengerResponseCallback = (accessRsp: MainAccessResponse) => void;
+export type WinId = string;
+export type InstanceId = string;
+export type RefId = string;
 export interface AssignWinInstanceId {
     $winId$: WinId;
 }
-export declare type AssignInstanceId = InstanceId | AssignWinInstanceId;
-export declare type MessageFromWorkerToSandbox = [type: WorkerMessageType.MainDataRequestFromWorker] | [type: WorkerMessageType.MainInterfacesRequestFromWorker] | [type: WorkerMessageType.InitializedWebWorker] | [
+export type AssignInstanceId = InstanceId | AssignWinInstanceId;
+export type MessageFromWorkerToSandbox = [type: WorkerMessageType.MainDataRequestFromWorker] | [type: WorkerMessageType.MainInterfacesRequestFromWorker] | [type: WorkerMessageType.InitializedWebWorker] | [
     type: WorkerMessageType.InitializedEnvironmentScript,
     winid: WinId,
     instanceId: InstanceId,
     errorMsg: string
 ] | [type: WorkerMessageType.InitializeNextScript, winId: WinId] | [type: WorkerMessageType.ForwardWorkerAccessRequest, accessReq: MainAccessRequest] | [type: WorkerMessageType.AsyncAccessRequest, accessReq: MainAccessRequest];
-export declare type MessageFromSandboxToWorker = [type: WorkerMessageType.MainDataResponseToWorker, initWebWorkerData: InitWebWorkerData] | [type: WorkerMessageType.MainInterfacesResponseToWorker, interfaces: InterfaceInfo[]] | [type: WorkerMessageType.InitializeEnvironment, initEnvData: InitializeEnvironmentData] | [type: WorkerMessageType.InitializeNextScript, initScriptData: InitializeScriptData] | [type: WorkerMessageType.InitializedScripts, winId: WinId] | [type: WorkerMessageType.RefHandlerCallback, callbackData: RefHandlerCallbackData] | [type: WorkerMessageType.ForwardMainTrigger, triggerData: ForwardMainTriggerData] | [type: WorkerMessageType.LocationUpdate, locationChangeData: LocationUpdateData] | [type: WorkerMessageType.DocumentVisibilityState, winId: WinId, visibilityState: string] | [
+export type MessageFromSandboxToWorker = [type: WorkerMessageType.MainDataResponseToWorker, initWebWorkerData: InitWebWorkerData] | [type: WorkerMessageType.MainInterfacesResponseToWorker, interfaces: InterfaceInfo[]] | [type: WorkerMessageType.InitializeEnvironment, initEnvData: InitializeEnvironmentData] | [type: WorkerMessageType.InitializeNextScript, initScriptData: InitializeScriptData] | [type: WorkerMessageType.InitializedScripts, winId: WinId] | [type: WorkerMessageType.RefHandlerCallback, callbackData: RefHandlerCallbackData] | [type: WorkerMessageType.ForwardMainTrigger, triggerData: ForwardMainTriggerData] | [type: WorkerMessageType.LocationUpdate, locationChangeData: LocationUpdateData] | [type: WorkerMessageType.DocumentVisibilityState, winId: WinId, visibilityState: string] | [
     type: WorkerMessageType.CustomElementCallback,
     winId: WinId,
     instanceId: InstanceId,
@@ -67,7 +67,7 @@ export interface RefHandlerCallbackData {
     $thisArg$: SerializedTransfer | undefined;
     $args$: SerializedTransfer | undefined;
 }
-export declare type PostMessageToWorker = (msg: MessageFromSandboxToWorker) => void;
+export type PostMessageToWorker = (msg: MessageFromSandboxToWorker) => void;
 export interface MainWindowContext {
     $winId$: WinId;
     $isInitialized$?: number;
@@ -93,16 +93,16 @@ export interface InitWebWorkerData {
  * [3]? InterfaceType
  * [4]? Node Name
  */
-export declare type InterfaceInfo = [string, string, InterfaceMember[], InterfaceType, string] | [string, string, InterfaceMember[], InterfaceType] | [string, string, InterfaceMember[]];
+export type InterfaceInfo = [string, string, InterfaceMember[], InterfaceType, string] | [string, string, InterfaceMember[], InterfaceType] | [string, string, InterfaceMember[]];
 /**
  * [0] Member name
  * [1] Constructor name or interface type
  * [2]? If there's a value it's a static prop
  */
-export declare type InterfaceMember = [string, string] | [string, InterfaceType.Function] | [string, InterfaceType.Property] | [string, InterfaceType.Property, string | number | boolean];
+export type InterfaceMember = [string, string] | [string, InterfaceType.Function] | [string, InterfaceType.Property] | [string, InterfaceType.Property, string | number | boolean];
 export interface WebWorkerContext {
     $asyncMsgTimer$?: any;
-    $config$: PartytownConfig;
+    $config$: PartytownInternalConfig;
     $importScripts$: (...urls: string[]) => void;
     $initWindowMedia$?: InitWindowMedia;
     $interfaces$: InterfaceInfo[];
@@ -192,7 +192,7 @@ export declare const enum ApplyPathType {
     SetValue = 0,
     GlobalConstructor = 1
 }
-export declare type ApplyPath = any[];
+export type ApplyPath = any[];
 export declare const enum SerializedType {
     Primitive = 0,
     Array = 1,
@@ -210,49 +210,49 @@ export declare const enum SerializedType {
     CSSStyleDeclaration = 13,
     Error = 14
 }
-export declare type SerializedArrayTransfer = [SerializedType.Array, (SerializedTransfer | undefined)[]];
-export declare type SerializedArrayBufferTransfer = [SerializedType.ArrayBuffer, any];
-export declare type SerializedArrayBufferViewTransfer = [SerializedType.ArrayBufferView, any, string];
-export declare type SerializedAttrTransfer = [SerializedType.Attr, SerializedAttr];
-export declare type SerializedCSSRuleTransfer = [SerializedType.CSSRule, SerializedCSSRule];
-export declare type SerializedCSSRuleListTransfer = [SerializedType.CSSRuleList, SerializedCSSRule[]];
-export declare type SerializedCSSStyleDeclarationTransfer = [
+export type SerializedArrayTransfer = [SerializedType.Array, (SerializedTransfer | undefined)[]];
+export type SerializedArrayBufferTransfer = [SerializedType.ArrayBuffer, any];
+export type SerializedArrayBufferViewTransfer = [SerializedType.ArrayBufferView, any, string];
+export type SerializedAttrTransfer = [SerializedType.Attr, SerializedAttr];
+export type SerializedCSSRuleTransfer = [SerializedType.CSSRule, SerializedCSSRule];
+export type SerializedCSSRuleListTransfer = [SerializedType.CSSRuleList, SerializedCSSRule[]];
+export type SerializedCSSStyleDeclarationTransfer = [
     SerializedType.CSSStyleDeclaration,
     {
         [key: string]: SerializedTransfer | undefined;
     }
 ];
-export declare type SerializedErrorTransfer = [SerializedType.Error, Error];
-export declare type SerializedEventTransfer = [SerializedType.Event, SerializedObject];
-export declare type SerializedFunctionTransfer = [SerializedType.Function];
-export declare type SerializedInstanceTransfer = [SerializedType.Instance, SerializedInstance];
-export declare type SerializedNodeListTransfer = [
+export type SerializedErrorTransfer = [SerializedType.Error, Error];
+export type SerializedEventTransfer = [SerializedType.Event, SerializedObject];
+export type SerializedFunctionTransfer = [SerializedType.Function];
+export type SerializedInstanceTransfer = [SerializedType.Instance, SerializedInstance];
+export type SerializedNodeListTransfer = [
     SerializedType.NodeList,
     (SerializedTransfer | undefined)[]
 ];
-export declare type SerializedObjectTransfer = [
+export type SerializedObjectTransfer = [
     SerializedType.Object,
     {
         [key: string]: SerializedTransfer | undefined;
     }
 ];
-export declare type SerializedAttr = [string, string];
-export declare type SerializedCSSRule = {
+export type SerializedAttr = [string, string];
+export type SerializedCSSRule = {
     [key: string]: string;
 };
-export declare type SerializedPrimitiveTransfer = [SerializedType.Primitive, string | number | boolean | null | undefined] | [SerializedType.Primitive];
-export declare type SerializedRefTransfer = [SerializedType.Ref, SerializedRefTransferData];
+export type SerializedPrimitiveTransfer = [SerializedType.Primitive, string | number | boolean | null | undefined] | [SerializedType.Primitive];
+export type SerializedRefTransfer = [SerializedType.Ref, SerializedRefTransferData];
 export interface SerializedRefTransferData {
     $winId$: WinId;
     $instanceId$: InstanceId;
     $refId$: RefId;
     $nodeName$?: string;
 }
-export declare type SerializedTransfer = SerializedArrayTransfer | SerializedArrayBufferTransfer | SerializedArrayBufferViewTransfer | SerializedAttrTransfer | SerializedCSSRuleTransfer | SerializedCSSRuleListTransfer | SerializedCSSStyleDeclarationTransfer | SerializedEventTransfer | SerializedFunctionTransfer | SerializedInstanceTransfer | SerializedNodeListTransfer | SerializedObjectTransfer | SerializedPrimitiveTransfer | SerializedRefTransfer | SerializedErrorTransfer | [];
+export type SerializedTransfer = SerializedArrayTransfer | SerializedArrayBufferTransfer | SerializedArrayBufferViewTransfer | SerializedAttrTransfer | SerializedCSSRuleTransfer | SerializedCSSRuleListTransfer | SerializedCSSStyleDeclarationTransfer | SerializedEventTransfer | SerializedFunctionTransfer | SerializedInstanceTransfer | SerializedNodeListTransfer | SerializedObjectTransfer | SerializedPrimitiveTransfer | SerializedRefTransfer | SerializedErrorTransfer | [];
 export interface SerializedObject {
     [key: string]: SerializedTransfer | undefined;
 }
-export declare type SerializedInstance = [type: WinId, type: InstanceId] | [
+export type SerializedInstance = [type: WinId, type: InstanceId] | [
     type: WinId,
     type: InstanceId,
     /**
@@ -264,7 +264,7 @@ export declare type SerializedInstance = [type: WinId, type: InstanceId] | [
 /**
  * @public
  */
-export declare type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe' | 'image';
+export type ResolveUrlType = 'fetch' | 'xhr' | 'script' | 'iframe' | 'image';
 /**
  * https://partytown.builder.io/configuration
  *
@@ -326,10 +326,10 @@ export interface PartytownConfig {
      * This array can be used to filter which script are executed via
      * Partytown and which you would like to execute on the main thread.
      *
-     * @example loadScriptsOnMainThread:['https://test.com/analytics.js', 'inline-script-id']
+     * @example loadScriptsOnMainThread:['https://test.com/analytics.js', 'inline-script-id', /regex-matched-script\.js/]
      * // Loads the `https://test.com/analytics.js` script on the main thread
      */
-    loadScriptsOnMainThread?: string[];
+    loadScriptsOnMainThread?: (string | RegExp)[];
     get?: GetHook;
     set?: SetHook;
     apply?: ApplyHook;
@@ -377,28 +377,67 @@ export interface PartytownConfig {
      * Path to the service worker file. Defaults to `partytown-sw.js`.
      */
     swPath?: string;
+    /**
+     * The nonce property may be set on script elements created by Partytown.
+     * This should be set only when dealing with content security policies
+     * and when the use of `unsafe-inline` is disabled (using `nonce-*` instead).
+     *
+     * Given the following example:
+     * ```html
+     * <head>
+     *   <script nonce="THIS_SHOULD_BE_REPLACED">
+     *     partytown = {
+     *       nonce: 'THIS_SHOULD_BE_REPLACED'
+     *     };
+     *   </script>
+     * </head>
+     * ```
+     *
+     * The `nonce` property should be generated by the server, and it should be unique
+     * for each request. You can leave a placeholder, as shown in the above example,
+     * to facilitate replacement through a regular expression on the server side.
+     * For instance, you can use the following code:
+     *
+     * ```js
+     * html.replace(/THIS_SHOULD_BE_REPLACED/g, nonce);
+     * ```
+     */
+    nonce?: string;
 }
+export type PartytownInternalConfig = Omit<PartytownConfig, 'loadScriptsOnMainThread'> & {
+    loadScriptsOnMainThread?: ['regexp' | 'string', string][];
+};
 /**
- * A foward property to patch on `window`. The foward config property is an string,
+ * @public
+ */
+export type PartytownForwardPropertySettings = {
+    preserveBehavior?: boolean;
+};
+/**
+ * @public
+ */
+export type PartytownForwardPropertyWithSettings = [string, PartytownForwardPropertySettings?];
+/**
+ * A forward property to patch on `window`. The forward config property is an string,
  * representing the call to forward, such as `dataLayer.push` or `fbq`.
  *
  * https://partytown.builder.io/forwarding-events
  *
  * @public
  */
-export declare type PartytownForwardProperty = string;
+export type PartytownForwardProperty = string | PartytownForwardPropertyWithSettings;
 /**
  * @public
  */
-export declare type GetHook = (opts: GetHookOptions) => any;
+export type GetHook = (opts: GetHookOptions) => any;
 /**
  * @public
  */
-export declare type SetHook = (opts: SetHookOptions) => any;
+export type SetHook = (opts: SetHookOptions) => any;
 /**
  * @public
  */
-export declare type ApplyHook = (opts: ApplyHookOptions) => any;
+export type ApplyHook = (opts: ApplyHookOptions) => any;
 export interface HookOptions {
     name: string;
     continue: Symbol;
@@ -425,7 +464,10 @@ export interface SetHookOptions extends HookOptions {
 export interface ApplyHookOptions extends HookOptions {
     args: any[];
 }
-export interface MainWindow extends Window {
+export type StringIndexable = {
+    [key: string]: any;
+};
+export interface MainWindow extends Window, StringIndexable {
     partytown?: PartytownConfig;
     _ptf?: any[];
 }
@@ -457,24 +499,24 @@ export declare const enum StateProp {
     url = 4,
     type = 5
 }
-export declare type EventHandler = (ev: any) => void;
-export declare type RefHandler = (...args: any[]) => void;
-export declare type StateMap = Record<number, StateRecord>;
-export declare type StateRecord = Record<string | number, any>;
-export declare type StorageItem = [/*key*/ string, /*value*/ string];
+export type EventHandler = (ev: any) => void;
+export type RefHandler = (...args: any[]) => void;
+export type StateMap = Record<number, StateRecord>;
+export type StateRecord = Record<string | number, any>;
+export type StorageItem = [/*key*/ string, /*value*/ string];
 export declare const enum CallType {
     Blocking = 1,
     NonBlocking = 2,
     NonBlockingNoSideEffect = 3
 }
-export declare type Getter = (instance: any, applyPath: ApplyPath, groupedGetters?: string[]) => any;
-export declare type Setter = (instance: any, applyPath: ApplyPath, value: any) => void;
-export declare type CallMethod = (instance: any, applyPath: ApplyPath, args: any[], callType?: CallType, assignInstanceId?: AssignInstanceId, buffer?: ArrayBuffer | ArrayBufferView) => any;
-export declare type ConstructGlobal = (instance: any, cstrName: string, args: any[]) => void;
-export declare type DefinePrototypePropertyDescriptor = (Cstr: any, propertyDescriptorMap: any) => void;
-export declare type RandomId = () => string;
+export type Getter = (instance: any, applyPath: ApplyPath, groupedGetters?: string[]) => any;
+export type Setter = (instance: any, applyPath: ApplyPath, value: any) => void;
+export type CallMethod = (instance: any, applyPath: ApplyPath, args: any[], callType?: CallType, assignInstanceId?: AssignInstanceId, buffer?: ArrayBuffer | ArrayBufferView) => any;
+export type ConstructGlobal = (instance: any, cstrName: string, args: any[]) => void;
+export type DefinePrototypePropertyDescriptor = (Cstr: any, propertyDescriptorMap: any) => void;
+export type RandomId = () => string;
 import type { ApplyPathKey, InstanceDataKey, InstanceIdKey, InstanceStateKey, NamespaceKey, WinIdKey } from './web-worker/worker-constants';
-export declare type LazyBridge = [
+export type LazyBridge = [
     Getter,
     Setter,
     CallMethod,
@@ -485,7 +527,7 @@ export declare type LazyBridge = [
     typeof InstanceIdKey,
     typeof ApplyPathKey
 ];
-export declare type InitWindowMedia = (WorkerBase: WorkerConstructor, WorkerEventTargetProxy: WorkerConstructor, env: WebWorkerEnvironment, win: WorkerWindow, windowMediaConstructors: string[]) => any;
+export type InitWindowMedia = (WorkerBase: WorkerConstructor, WorkerEventTargetProxy: WorkerConstructor, env: WebWorkerEnvironment, win: WorkerWindow, windowMediaConstructors: string[]) => any;
 export interface MediaSelf {
     $bridgeToMedia$?: LazyBridge;
     $bridgeFromMedia$?: InitWindowMedia;
@@ -508,6 +550,7 @@ export interface WorkerInstance {
     };
 }
 export interface WorkerNode extends WorkerInstance, Node {
+    id?: string | undefined | null;
     type: string | undefined;
 }
 export interface WorkerWindow extends WorkerInstance {
@@ -516,4 +559,4 @@ export interface WorkerWindow extends WorkerInstance {
 export interface WorkerNodeConstructors {
     [tagName: string]: WorkerConstructor;
 }
-export declare type CustomElementData = [cstrName: string, observedAttributes: string[]];
+export type CustomElementData = [cstrName: string, observedAttributes: string[]];

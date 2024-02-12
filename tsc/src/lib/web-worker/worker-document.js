@@ -41,10 +41,10 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
                 if (!IS_TAG_REG.test(tagName)) {
                     throw tagName + ' not valid';
                 }
-                const isIframe = tagName === "IFRAME" /* IFrame */;
+                const isIframe = tagName === "IFRAME" /* NodeName.IFrame */;
                 const winId = this[WinIdKey];
                 const instanceId = (isIframe ? 'f_' : '') + randomId();
-                callMethod(this, ['createElement'], [tagName], 2 /* NonBlocking */, instanceId);
+                callMethod(this, ['createElement'], [tagName], 2 /* CallType.NonBlocking */, instanceId);
                 const elm = getOrCreateNodeInstance(winId, instanceId, tagName);
                 if (isIframe) {
                     // an iframe element's instanceId is the same as its contentWindow's winId
@@ -60,8 +60,8 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
                     env.$window$.fetch = fetch;
                     setter(elm, ['srcdoc'], getPartytownScript());
                 }
-                else if (tagName === "SCRIPT" /* Script */) {
-                    const scriptType = getInstanceStateValue(elm, 5 /* type */);
+                else if (tagName === "SCRIPT" /* NodeName.Script */) {
+                    const scriptType = getInstanceStateValue(elm, 5 /* StateProp.type */);
                     if (isScriptJsType(scriptType)) {
                         setter(elm, ['type'], SCRIPT_TYPE);
                     }
@@ -73,7 +73,7 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
             value(namespace, tagName) {
                 const instanceId = randomId();
                 const nsElm = getOrCreateNodeInstance(this[WinIdKey], instanceId, tagName, namespace);
-                callMethod(this, ['createElementNS'], [namespace, tagName], 2 /* NonBlocking */, instanceId);
+                callMethod(this, ['createElementNS'], [namespace, tagName], 2 /* CallType.NonBlocking */, instanceId);
                 return nsElm;
             },
         },
@@ -81,8 +81,8 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
             value(text) {
                 const winId = this[WinIdKey];
                 const instanceId = randomId();
-                const textNode = getOrCreateNodeInstance(winId, instanceId, "#text" /* Text */);
-                callMethod(this, ['createTextNode'], [text], 2 /* NonBlocking */, instanceId);
+                const textNode = getOrCreateNodeInstance(winId, instanceId, "#text" /* NodeName.Text */);
+                callMethod(this, ['createTextNode'], [text], 2 /* CallType.NonBlocking */, instanceId);
                 return textNode;
             },
         },
@@ -92,7 +92,7 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
         currentScript: {
             get() {
                 if (env.$currentScriptId$) {
-                    return getOrCreateNodeInstance(this[WinIdKey], env.$currentScriptId$, "SCRIPT" /* Script */);
+                    return getOrCreateNodeInstance(this[WinIdKey], env.$currentScriptId$, "SCRIPT" /* NodeName.Script */);
                 }
                 return null;
             },
@@ -110,10 +110,10 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
         getElementsByTagName: {
             value(tagName) {
                 tagName = tagName.toUpperCase();
-                if (tagName === "BODY" /* Body */) {
+                if (tagName === "BODY" /* NodeName.Body */) {
                     return [env.$body$];
                 }
-                else if (tagName === "HEAD" /* Head */) {
+                else if (tagName === "HEAD" /* NodeName.Head */) {
                     return [env.$head$];
                 }
                 else {
@@ -131,13 +131,18 @@ export const patchDocument = (WorkerDocument, env, isDocumentImplementation) => 
                 return getter(this, ['images']);
             },
         },
+        scripts: {
+            get() {
+                return getter(this, ['scripts']);
+            },
+        },
         implementation: {
             get() {
                 return {
                     hasFeature: () => true,
                     createHTMLDocument: (title) => {
                         const $winId$ = randomId();
-                        callMethod(this, ['implementation', 'createHTMLDocument'], [title], 1 /* Blocking */, {
+                        callMethod(this, ['implementation', 'createHTMLDocument'], [title], 1 /* CallType.Blocking */, {
                             $winId$,
                         });
                         const docEnv = createEnvironment({

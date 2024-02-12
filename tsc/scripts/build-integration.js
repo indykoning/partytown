@@ -1,6 +1,7 @@
-import { submodulePackageJson } from './utils';
-import { join } from 'path';
-import { readFile } from 'fs-extra';
+import { submodulePackageJson } from './utils.js';
+import { join } from 'node:path';
+import fsExtra from 'fs-extra';
+const { readFile } = fsExtra;
 export function buildIntegration(opts) {
     const output = [
         {
@@ -10,6 +11,11 @@ export function buildIntegration(opts) {
         {
             file: join(opts.distIntegrationDir, 'index.mjs'),
             format: 'es',
+        },
+        {
+            file: join(opts.testsDir, 'integrations', 'load-scripts-on-main-thread', 'snippet.js'),
+            format: 'umd',
+            name: 'partytownIntegration',
         },
     ];
     return {

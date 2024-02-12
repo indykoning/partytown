@@ -8,7 +8,7 @@ export const defineCustomElement = (winId, worker, ceData) => {
     const ceCallbackMethods = 'connectedCallback,disconnectedCallback,attributeChangedCallback,adoptedCallback'.split(',');
     ceCallbackMethods.map((callbackMethodName) => (Cstr.prototype[callbackMethodName] = function (...args) {
         worker.postMessage([
-            15 /* CustomElementCallback */,
+            15 /* WorkerMessageType.CustomElementCallback */,
             winId,
             getAndSetInstanceId(this),
             callbackMethodName,
