@@ -1,0 +1,1 @@
+export { Partytown } from './snippet';
